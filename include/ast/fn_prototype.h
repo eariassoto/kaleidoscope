@@ -4,16 +4,17 @@
 #include "ast/expression.h"
 
 #include <memory>
-#include <string>
+#include <string_view>
 #include <vector>
 
 namespace kaleidoscope::ast
 {
 struct FnPrototype : public Expression {
-    FnPrototype(const std::string &name, std::vector<std::string> args);
+    FnPrototype(const std::string_view &name,
+                std::vector<std::string_view> args);
 
-    std::string Name;
-    std::vector<std::string> Args;
+    std::string_view Name;
+    std::vector<std::string_view> Args;
 };
 
 }  // namespace kaleidoscope::ast

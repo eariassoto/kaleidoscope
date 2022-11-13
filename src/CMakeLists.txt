@@ -8,6 +8,7 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS
   "${Kaleidoscope_SOURCE_DIR}/include/ast/number.h"
   "${Kaleidoscope_SOURCE_DIR}/include/ast/variable.h"
   "${Kaleidoscope_SOURCE_DIR}/include/lexer/lexer.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/parser/parser.h"
 )
 
 file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
@@ -18,6 +19,7 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
   "ast/number.cc"
   "ast/variable.cc"
   "lexer/lexer.cc"
+  "parser/parser.cc"
 )
 
 add_library(kaleidoscope ${SOURCE_LIST} ${HEADER_LIST})

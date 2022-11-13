@@ -2,6 +2,6 @@
 
 namespace kaleidoscope::ast
 {
-Variable::Variable(std::string name) : Name(name) {}
+Variable::Variable(std::string_view name) : Name(name) {}
 
 }  // namespace kaleidoscope::ast

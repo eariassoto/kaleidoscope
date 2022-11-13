@@ -3,15 +3,15 @@
 
 #include "ast/expression.h"
 
-#include <string>
+#include <string_view>
 
 namespace kaleidoscope::ast
 {
 struct Variable : public Expression
 {
-    Variable(std::string name);
+    Variable(std::string_view name);
     
-    std::string Name;
+    std::string_view Name;
 };
 
 } // namespace kaleidoscope::ast

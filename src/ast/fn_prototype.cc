@@ -2,7 +2,8 @@
 
 namespace kaleidoscope::ast
 {
-FnPrototype::FnPrototype(const std::string &name, std::vector<std::string> args)
+FnPrototype::FnPrototype(const std::string_view &name,
+                         std::vector<std::string_view> args)
     : Name(name), Args(std::move(args))
 {
 }

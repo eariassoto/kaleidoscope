@@ -1,4 +1,5 @@
 #include <lexer/lexer.h>
+#include <parser/parser.h>
 
 #include <iostream>
 
@@ -27,15 +28,15 @@ void processAndPrint(std::string input)
 
 int main()
 {
-    // std::string input("extern def abc (12.34)");
-    // processAndPrint(std::move(input));
-
     while (true) {
         std::cout << "Eval > ";
         std::string input;
         getline(std::cin, input);
         if (input == "quit") break;
-        processAndPrint(std::move(input));
+
+        auto lexer = std::make_unique<kaleidoscope::Lexer>(std::move(input));
+        kaleidoscope::Parser parser(std::move(lexer));
+        auto expr = parser.ParseNextExpression();
     }
 
     return 0;
