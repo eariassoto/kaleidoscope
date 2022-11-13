@@ -14,6 +14,9 @@ struct Fn : public Expression {
     char Op;
     std::unique_ptr<FnPrototype> Proto;
     std::unique_ptr<Expression> Body;
+
+    void PrintToString(std::string& out_str, size_t indent_level,
+                       char space_char, size_t indent_size) final;
 };
 
 }  // namespace kaleidoscope::ast

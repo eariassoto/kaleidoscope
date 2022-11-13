@@ -28,6 +28,8 @@ target_include_directories(kaleidoscope PUBLIC ../include)
 
 target_compile_features(kaleidoscope PUBLIC cxx_std_17)
 
+target_link_libraries(kaleidoscope PUBLIC fmt)
+
 source_group(
   TREE "${PROJECT_SOURCE_DIR}/include"
   PREFIX "Header Files"

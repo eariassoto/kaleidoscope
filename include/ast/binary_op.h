@@ -14,6 +14,9 @@ struct BinaryOp : public Expression {
     char Op;
     std::unique_ptr<Expression> LhsOp;
     std::unique_ptr<Expression> RhsOp;
+
+    void PrintToString(std::string& out_str, size_t indent_level,
+                       char space_char, size_t indent_size) final;
 };
 
 }  // namespace kaleidoscope::ast

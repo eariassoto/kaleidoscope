@@ -5,13 +5,15 @@
 
 namespace kaleidoscope::ast
 {
-struct Number : public Expression
-{
+struct Number : public Expression {
     Number(double value);
-    
+
     double Value;
+
+    void PrintToString(std::string& out_str, size_t indent_level,
+                       char space_char, size_t indent_size) final;
 };
 
-} // namespace kaleidoscope::ast
+}  // namespace kaleidoscope::ast
 
 #endif  // AST_NUMBER_H
