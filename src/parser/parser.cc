@@ -139,10 +139,10 @@ std::unique_ptr<ast::Expression> Parser::ParseBinaryOpRhs(
     while (true) {
         if (!IsCurrentTokenBinOp()) return lhs_expression;
 
+        int curr_token_prec = GetCurrBinOpTokenPrecedence();
         // If this is a binop that binds at least as tightly as the current
         // binop, consume it, otherwise we are done.
-        if (GetCurrBinOpTokenPrecedence() < expression_precedence)
-            return lhs_expression;
+        if (curr_token_prec < expression_precedence) return lhs_expression;
 
         char bin_op = m_Lexer->GetAscii();
         GetNextToken();  // eat binop
@@ -153,8 +153,8 @@ std::unique_ptr<ast::Expression> Parser::ParseBinaryOpRhs(
 
         // If BinOp binds less tightly with RHS than the operator after RHS, let
         // the pending operator take RHS as its LHS.
-        if (IsCurrentTokenBinOp()
-                 && expression_precedence < GetCurrBinOpTokenPrecedence()) {
+        if (IsCurrentTokenBinOp() &&
+            curr_token_prec < GetCurrBinOpTokenPrecedence()) {
             rhs_expression = ParseBinaryOpRhs(expression_precedence + 1,
                                               std::move(rhs_expression));
             if (!rhs_expression) return nullptr;
@@ -247,7 +247,6 @@ std::unique_ptr<ast::Expression> Parser::ParseNextExpression()
         return nullptr;
     else if (m_CurrentToken == Token::kTokenDef) {
         if (auto def = ParseDefinition()) {
-            std::cout << "Parsed a function definition.\n";
             return def;
         }
         // Skip token for error recovery.
@@ -255,15 +254,12 @@ std::unique_ptr<ast::Expression> Parser::ParseNextExpression()
         return nullptr;
     } else if (m_CurrentToken == Token::kTokenExtern) {
         if (auto ext = ParseExtern()) {
-            std::cout << "Parsed an extern\n";
             return ext;
         } else {
             // Skip token for error recovery.
             GetNextToken();
         }
-    }
-    else if (auto expression = ParseExpression()) {
-        std::cout << "Parsed an expression\n";
+    } else if (auto expression = ParseExpression()) {
         return expression;
     }
     // Skip token for error recovery.
