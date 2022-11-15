@@ -14,6 +14,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
   # Support folders in IDEs
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+  include(CTest)
 endif()  # (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
 include(FetchContent)
@@ -26,4 +28,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(fmtlib)
 
 add_subdirectory(src)
+
 add_subdirectory(apps)
+
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
+   AND BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
