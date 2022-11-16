@@ -41,14 +41,14 @@ class Token2
     }
 
     // Consider to refactoring these into CreateReservedWord
-    static [[nodiscard]] std::unique_ptr<Token2> CreateEof();
-    static [[nodiscard]] std::unique_ptr<Token2> CreateDef();
-    static [[nodiscard]] std::unique_ptr<Token2> CreateExtern();
+    [[nodiscard]] static std::unique_ptr<Token2> CreateEof();
+    [[nodiscard]] static std::unique_ptr<Token2> CreateDef();
+    [[nodiscard]] static std::unique_ptr<Token2> CreateExtern();
 
-    static [[nodiscard]] std::unique_ptr<Token2> CreateIdentifier(
+    [[nodiscard]] static std::unique_ptr<Token2> CreateIdentifier(
         std::string_view value);
 
-    static [[nodiscard]] std::unique_ptr<Token2> CreateNumber(
+    [[nodiscard]] static std::unique_ptr<Token2> CreateNumber(
         std::string_view value);
 
    private:
