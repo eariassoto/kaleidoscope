@@ -58,6 +58,15 @@ TEST_F(TokenTest, CreateNumber)
     EXPECT_EQ(42.0, token->GetValue<double>());
 }
 
+TEST_F(TokenTest, CreateCharacter)
+{
+    const char c = '(';
+    std::unique_ptr<Token2> token = Token2::CreateCharacter(c);
+    ASSERT_TRUE(token.get());
+    EXPECT_EQ(Token2::Type::kCharacter, token->GetType());
+    EXPECT_EQ(c, token->GetValue<char>());
+}
+
 TEST_F(TokenTest, GetValue_string_view)
 {
     {
@@ -81,6 +90,13 @@ TEST_F(TokenTest, GetValue_string_view)
     {
         const std::string_view number = "42.0"sv;
         std::unique_ptr<Token2> token = Token2::CreateNumber(number);
+        ASSERT_TRUE(token.get());
+        EXPECT_THROW(ignore(token->GetValue<std::string_view>()),
+                     std::invalid_argument);
+    }
+    {
+        const char c = '(';
+        std::unique_ptr<Token2> token = Token2::CreateCharacter(c);
         ASSERT_TRUE(token.get());
         EXPECT_THROW(ignore(token->GetValue<std::string_view>()),
                      std::invalid_argument);
@@ -118,12 +134,27 @@ TEST_F(TokenTest, GetValue_double)
         EXPECT_THROW(ignore(token->GetValue<double>()), std::invalid_argument);
     }
     {
+        const char c = '(';
+        std::unique_ptr<Token2> token = Token2::CreateCharacter(c);
+        ASSERT_TRUE(token.get());
+        EXPECT_THROW(ignore(token->GetValue<std::string_view>()),
+                     std::invalid_argument);
+    }
+    {
         const std::string_view number = "42.0"sv;
         std::unique_ptr<Token2> token = Token2::CreateNumber(number);
         ASSERT_TRUE(token.get());
         EXPECT_NO_THROW(ignore(token->GetValue<double>()));
         EXPECT_EQ(42.0, token->GetValue<double>());
     }
+}
+
+TEST_F(TokenTest, GetValue_invalid_type)
+{
+    const std::string_view number = "42.0"sv;
+    std::unique_ptr<Token2> token = Token2::CreateNumber(number);
+    ASSERT_TRUE(token.get());
+    EXPECT_THROW(ignore(token->GetValue<float>()), std::invalid_argument);
 }
 
 int main(int argc, char** argv)

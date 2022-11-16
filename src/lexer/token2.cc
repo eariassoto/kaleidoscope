@@ -18,6 +18,11 @@ Token2::Token2(double number_value) : type_(Type::kNumber), value_(number_value)
 {
 }
 
+Token2::Token2(char character_value)
+    : type_(Type::kCharacter), value_(character_value)
+{
+}
+
 /*static*/ std::unique_ptr<Token2> Token2::CreateEof()
 {
     return std::unique_ptr<Token2>(new Token2(Type::kEof));
@@ -47,6 +52,11 @@ Token2::Token2(double number_value) : type_(Type::kNumber), value_(number_value)
     if (ec != std::errc())
         throw std::invalid_argument("Value cannot be converted to double.");
     return std::unique_ptr<Token2>(new Token2(result));
+}
+
+/*static*/ std::unique_ptr<Token2> Token2::CreateCharacter(char value)
+{
+    return std::unique_ptr<Token2>(new Token2(value));
 }
 
 }  // namespace kaleidoscope
