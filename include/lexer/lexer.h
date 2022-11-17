@@ -20,12 +20,14 @@ class Lexer
     std::unique_ptr<Token> GetNextToken();
 
    private:
-    void AdvanceIndex();
+    void AdvanceInputPos();
     std::string_view GetNextAlphaNum();
     std::string_view GetNextDigit();
 
-    std::string m_Input;
-    size_t m_CharIndex = 0;
+    std::string input_;
+    size_t curr_input_pos_ = 0;
+
+    std::unique_ptr<Token> next_token_ = nullptr;
 };
 }  // namespace kaleidoscope
 

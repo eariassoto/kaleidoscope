@@ -45,28 +45,30 @@ static constexpr std::array<char, 6> kAllowedCharacters{'(', ')', '+',
 
 std::string_view Lexer::GetNextAlphaNum()
 {
-    const char* start_index = &m_Input[m_CharIndex];
+    const char* start_index = &input_[curr_input_pos_];
     while (true) {
-        ++m_CharIndex;
-        if (m_CharIndex >= m_Input.size() ||
-            !std::isalnum(static_cast<unsigned char>(m_Input[m_CharIndex]))) {
+        ++curr_input_pos_;
+        if (curr_input_pos_ >= input_.size() ||
+            !std::isalnum(
+                static_cast<unsigned char>(input_[curr_input_pos_]))) {
             break;
         }
     }
-    const size_t count = &m_Input[m_CharIndex] - start_index;
+    const size_t count = &input_[curr_input_pos_] - start_index;
     return std::string_view(start_index, count);
 }
 
 std::string_view Lexer::GetNextDigit()
 {
-    const char* start_index = &m_Input[m_CharIndex];
-    unsigned char curr_char = static_cast<unsigned char>(m_Input[m_CharIndex]);
+    const char* start_index = &input_[curr_input_pos_];
+    unsigned char curr_char =
+        static_cast<unsigned char>(input_[curr_input_pos_]);
     bool point_found = curr_char == '.';
     while (true) {
-        ++m_CharIndex;
-        if (m_CharIndex >= m_Input.size()) break;  // nothing else to read
+        ++curr_input_pos_;
+        if (curr_input_pos_ >= input_.size()) break;  // nothing else to read
 
-        curr_char = static_cast<unsigned char>(m_Input[m_CharIndex]);
+        curr_char = static_cast<unsigned char>(input_[curr_input_pos_]);
 
         if (curr_char == '.') {
             // Only read one decimal point
@@ -76,28 +78,28 @@ std::string_view Lexer::GetNextDigit()
             break;
     }
 
-    const size_t count = &m_Input[m_CharIndex] - start_index;
+    const size_t count = &input_[curr_input_pos_] - start_index;
     return std::string_view(start_index, count);
 }
 
-void Lexer::AdvanceIndex()
+void Lexer::AdvanceInputPos()
 {
-    while (m_CharIndex < m_Input.size() &&
-           std::isspace(static_cast<unsigned char>(m_Input[m_CharIndex]))) {
-        ++m_CharIndex;
+    while (curr_input_pos_ < input_.size() &&
+           std::isspace(static_cast<unsigned char>(input_[curr_input_pos_]))) {
+        ++curr_input_pos_;
     }
 }
 
-Lexer::Lexer(std::string input) : m_Input(std::move(input)) {}
+Lexer::Lexer(std::string input) : input_(std::move(input)) {}
 
 std::unique_ptr<Token> Lexer::GetNextToken()
 {
-    AdvanceIndex();
-    // std::cout << "m_CharIndex: " << m_CharIndex << '\n';
-    if (m_CharIndex >= m_Input.size()) return Token::CreateEof();
+    AdvanceInputPos();
+    // std::cout << "curr_input_pos_: " << curr_input_pos_ << '\n';
+    if (curr_input_pos_ >= input_.size()) return Token::CreateEof();
 
     const unsigned char curr_char =
-        static_cast<unsigned char>(m_Input[m_CharIndex]);
+        static_cast<unsigned char>(input_[curr_input_pos_]);
     if (std::isalpha(curr_char)) {
         std::string_view next_alphanum = GetNextAlphaNum();
         // std::cout << "got: " << next_alphanum << '\n';
