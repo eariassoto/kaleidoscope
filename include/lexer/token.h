@@ -1,5 +1,5 @@
-#ifndef LEXER_TOKEN2_H
-#define LEXER_TOKEN2_H
+#ifndef LEXER_TOKEN_H
+#define LEXER_TOKEN_H
 
 #include <cassert>
 #include <memory>
@@ -9,7 +9,7 @@
 
 namespace kaleidoscope
 {
-class Token2
+class Token
 {
    public:
     enum class Type {
@@ -24,8 +24,8 @@ class Token2
         kCharacter
     };
 
-    Token2() = delete;
-    ~Token2();
+    Token() = delete;
+    ~Token();
 
     inline Type GetType() const { return type_; }
 
@@ -48,24 +48,24 @@ class Token2
         throw std::invalid_argument("Invalid type for token.");
     }
 
-    // Consider to refactoring these into CreateReservedWord
-    [[nodiscard]] static std::unique_ptr<Token2> CreateEof();
-    [[nodiscard]] static std::unique_ptr<Token2> CreateDef();
-    [[nodiscard]] static std::unique_ptr<Token2> CreateExtern();
+    bool IsCharToken(char value) const;
 
-    [[nodiscard]] static std::unique_ptr<Token2> CreateIdentifier(
+    [[nodiscard]] static std::unique_ptr<Token> CreateEof();
+    [[nodiscard]] static std::unique_ptr<Token> CreateDef();
+    [[nodiscard]] static std::unique_ptr<Token> CreateExtern();
+
+    [[nodiscard]] static std::unique_ptr<Token> CreateIdentifier(
         std::string_view value);
 
-    [[nodiscard]] static std::unique_ptr<Token2> CreateNumber(
-        std::string_view value);
+    [[nodiscard]] static std::unique_ptr<Token> CreateNumber(double value);
 
-    [[nodiscard]] static std::unique_ptr<Token2> CreateCharacter(char value);
+    [[nodiscard]] static std::unique_ptr<Token> CreateCharacter(char value);
 
    private:
-    explicit Token2(Type type);
-    explicit Token2(std::string_view identifier_value);
-    explicit Token2(double number_value);
-    explicit Token2(char character_value);
+    explicit Token(Type type);
+    explicit Token(std::string_view identifier_value);
+    explicit Token(double number_value);
+    explicit Token(char character_value);
 
    private:
     Type type_;
@@ -74,4 +74,4 @@ class Token2
 
 }  // namespace kaleidoscope
 
-#endif  // LEXER_TOKEN2_H
+#endif  // LEXER_TOKEN_H

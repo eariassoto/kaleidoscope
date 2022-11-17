@@ -27,37 +27,30 @@ std::unique_ptr<ast::FnPrototype> LogErrorP(const std::string& err_str)
     std::cerr << "LogError: " << err_str << '\n';
     return nullptr;
 }
+
+bool IsTokenBinOp(const Token2& token)
+{
+    return token.IsCharToken('+') || token.IsCharToken('-') ||
+           token.IsCharToken('*');
+}
+
+int GetTokenPrecedence(char value)
+{
+    // if (value == '<') return 10;
+    if (value == '+') return 20;
+    if (value == '-') return 20;
+    if (value == '*') return 40;
+    throw std::range_error("Not found");
+}
 }  // namespace
 
 Parser::Parser(std::unique_ptr<Lexer> lexer) : m_Lexer(std::move(lexer)) {}
 
 Parser::~Parser() = default;
 
-Token Parser::GetNextToken()
+void Parser::AdvanceToNextToken()
 {
-    return m_CurrentToken = m_Lexer->GetNextToken();
-}
-
-bool Parser::IsCurrentTokenAscii(char ch) const
-{
-    if (m_CurrentToken != Token::kTokenAscii) return false;
-    return m_Lexer->GetAscii() == ch;
-}
-
-bool Parser::IsCurrentTokenBinOp() const
-{
-    if (m_CurrentToken != Token::kTokenAscii) return false;
-    return m_Lexer->GetAscii() == '+' || m_Lexer->GetAscii() == '-' ||
-           m_Lexer->GetAscii() == '*' || m_Lexer->GetAscii() == '<';
-}
-
-int Parser::GetCurrBinOpTokenPrecedence() const
-{
-    if (m_Lexer->GetAscii() == '<') return 10;
-    if (m_Lexer->GetAscii() == '+') return 20;
-    if (m_Lexer->GetAscii() == '-') return 20;
-    if (m_Lexer->GetAscii() == '*') return 40;
-    throw std::range_error("Not found");
+    m_CurrentToken.swap(m_Lexer->GetNextToken());
 }
 
 /// numberexpr ::= number

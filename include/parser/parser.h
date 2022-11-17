@@ -4,6 +4,7 @@
 #include "ast/expression.h"
 #include "ast/fn.h"
 #include "ast/fn_prototype.h"
+#include "lexer/token2.h"
 
 #include <memory>
 #include <string>
@@ -27,12 +28,10 @@ class Parser
 
    private:
     std::unique_ptr<Lexer> m_Lexer;
-    Token m_CurrentToken;
+    std::unique_ptr<Token2> m_CurrentToken;
 
    private:
-    Token GetNextToken();
-    bool IsCurrentTokenAscii(char ch) const;
-    bool IsCurrentTokenBinOp() const;
+    void AdvanceToNextToken();
     int GetCurrBinOpTokenPrecedence() const;
 
     std::unique_ptr<ast::Expression> ParseNumberExpression();

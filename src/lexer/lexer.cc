@@ -4,6 +4,7 @@
 #include <array>
 #include <cctype>
 #include <charconv>
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
@@ -16,41 +17,31 @@ namespace kaleidoscope
 
 namespace
 {
-static constexpr std::array<std::pair<std::string_view, Token>, 2>
-    RESERVED_TOKENS{
-        {{"def"sv, Token::kTokenDef}, {"extern"sv, Token::kTokenExtern}}};
+const std::string_view kDefKeyword = "def"sv;
+const std::string_view kExternKeyword = "extern"sv;
 
-// Could be made constexpr for C++20
-[[nodiscard]] Token FindReserved(std::string_view input)
-{
-    const auto it =
-        std::find_if(begin(RESERVED_TOKENS), end(RESERVED_TOKENS),
-                     [&input](const auto& v) { return input == v.first; });
-    if (it != end(RESERVED_TOKENS)) {
-        return it->second;
-    }
-    return Token::kTokenIdentifier;
-}
+static constexpr std::array<char, 6> kAllowedCharacters{'(', ')', '+',
+                                                        '-', '*', ','};
 }  // namespace
 
-[[nodiscard]] const char* TokenAsString(Token t)
-{
-    if (t == Token::kTokenEof)
-        return "kTokenEof";
-    else if (t == Token::kTokenDef)
-        return "kTokenDef";
-    else if (t == Token::kTokenExtern)
-        return "kTokenExtern";
-    else if (t == Token::kTokenIdentifier)
-        return "kTokenIdentifier";
-    else if (t == Token::kTokenNumber)
-        return "kTokenNumber";
-    else if (t == Token::kTokenAscii)
-        return "kTokenAscii";
-    else if (t == Token::kTokenUnknown)
-        return "kTokenUnknown";
-    throw std::range_error("Not found");
-}
+// [[nodiscard]] const char* TokenAsString(Token t)
+// {
+//     if (t == Token::kTokenEof)
+//         return "kTokenEof";
+//     else if (t == Token::kTokenDef)
+//         return "kTokenDef";
+//     else if (t == Token::kTokenExtern)
+//         return "kTokenExtern";
+//     else if (t == Token::kTokenIdentifier)
+//         return "kTokenIdentifier";
+//     else if (t == Token::kTokenNumber)
+//         return "kTokenNumber";
+//     else if (t == Token::kTokenAscii)
+//         return "kTokenAscii";
+//     else if (t == Token::kTokenUnknown)
+//         return "kTokenUnknown";
+//     throw std::range_error("Not found");
+// }
 
 std::string_view Lexer::GetNextAlphaNum()
 {
@@ -99,37 +90,40 @@ void Lexer::AdvanceIndex()
 
 Lexer::Lexer(std::string input) : m_Input(std::move(input)) {}
 
-std::string_view Lexer::GetIdentifier() const { return m_Identifier; }
-
-double Lexer::GetNumber() const { return m_Num; }
-
-char Lexer::GetAscii() const { return m_Ascii; }
-
-Token Lexer::GetNextToken()
+std::unique_ptr<Token> Lexer::GetNextToken()
 {
     AdvanceIndex();
     // std::cout << "m_CharIndex: " << m_CharIndex << '\n';
-    if (m_CharIndex >= m_Input.size()) return Token::kTokenEof;
+    if (m_CharIndex >= m_Input.size()) return Token::CreateEof();
 
     const unsigned char curr_char =
         static_cast<unsigned char>(m_Input[m_CharIndex]);
     if (std::isalpha(curr_char)) {
         std::string_view next_alphanum = GetNextAlphaNum();
         // std::cout << "got: " << next_alphanum << '\n';
-        Token next_token = FindReserved(next_alphanum);
-        if (next_token == Token::kTokenIdentifier) m_Identifier = next_alphanum;
-        return next_token;
+        if (next_alphanum == kDefKeyword)
+            return Token::CreateDef();
+        else if (next_alphanum == kExternKeyword)
+            return Token::CreateExtern();
+        else
+            return Token::CreateIdentifier(next_alphanum);
     } else if (std::isdigit(curr_char)) {
         std::string_view next_num = GetNextDigit();
-        std::from_chars(next_num.data(), next_num.data() + next_num.size(),
-                        m_Num);
-        return Token::kTokenNumber;
+        double result;
+        auto [ptr, ec]{std::from_chars(
+            next_num.data(), next_num.data() + next_num.size(), result)};
+        assert(ec == std::errc());
+        return Token::CreateNumber(result);
     }
-    // default, assume ascii
-     m_Ascii = curr_char;
-     ++m_CharIndex;
-     return Token::kTokenAscii;
-    //return Token::kTokenUnknown;
+    if (std::find_if(begin(kAllowedCharacters), end(kAllowedCharacters),
+                     [&curr_char](const auto& ch) {
+                         return curr_char == ch;
+                     }) != end(kAllowedCharacters)) {
+        return Token::CreateCharacter(curr_char);
+    }
+
+    // TODO: Handle invalid case
+    return nullptr;
 }
 
 Lexer::~Lexer() = default;
