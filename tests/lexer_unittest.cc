@@ -29,7 +29,7 @@ TEST_F(LexerTest, EmptyInputWithSpaces)
     EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
 
-TEST_F(LexerTest, Def)
+TEST_F(LexerTest, ParseDefTokens)
 {
     const char *input =
         "def def   def"
@@ -47,7 +47,7 @@ TEST_F(LexerTest, Def)
     EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
 
-TEST_F(LexerTest, Extern)
+TEST_F(LexerTest, ParseExternTokens)
 {
     const char *input =
         "extern extern   "
@@ -65,35 +65,45 @@ TEST_F(LexerTest, Extern)
     EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
 
-TEST_F(LexerTest, Indentifier)
+TEST_F(LexerTest, ParseIdentifierTokens)
 {
-    {
-        Lexer lexer(std::string("abc12AB"));
+    Lexer lexer(std::string("   \r\nid1 Abc78TTTT"));
 
-        std::unique_ptr<Token> next_token = lexer.GetNextToken();
-        ASSERT_TRUE(next_token);
-        EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
-        EXPECT_EQ("abc12AB", next_token->GetValue());
+    std::unique_ptr<Token> next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
+    EXPECT_EQ("id1", next_token->GetValue());
 
-        next_token = lexer.GetNextToken();
-        ASSERT_TRUE(next_token);
-        EXPECT_EQ(TokenType::kEof, next_token->GetType());
-    }
-    {
-        Lexer lexer(std::string("   \r\nid1 Abc78TTTT"));
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
+    EXPECT_EQ("Abc78TTTT", next_token->GetValue());
 
-        std::unique_ptr<Token> next_token = lexer.GetNextToken();
-        ASSERT_TRUE(next_token);
-        EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
-        EXPECT_EQ("id1", next_token->GetValue());
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kEof, next_token->GetType());
+}
 
-        next_token = lexer.GetNextToken();
-        ASSERT_TRUE(next_token);
-        EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
-        EXPECT_EQ("Abc78TTTT", next_token->GetValue());
+TEST_F(LexerTest, ParseNumberTokens)
+{
+    Lexer lexer(std::string("   \n\n\r\n1    \r\n888734743  42"));
 
-        next_token = lexer.GetNextToken();
-        ASSERT_TRUE(next_token);
-        EXPECT_EQ(TokenType::kEof, next_token->GetType());
-    }
+    std::unique_ptr<Token> next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kNumber, next_token->GetType());
+    EXPECT_EQ("1", next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kNumber, next_token->GetType());
+    EXPECT_EQ("888734743", next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kNumber, next_token->GetType());
+    EXPECT_EQ("42", next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
