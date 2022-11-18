@@ -75,7 +75,8 @@ Lexer::Lexer(std::string input)
 std::unique_ptr<Token> Lexer::GetNextToken()
 {
     // std::cout << "enter GetNextToken\n";
-    if (input_to_process_.empty()) return Token::CreateEof();
+    if (input_to_process_.empty())
+        return std::make_unique<Token>(TokenType::kEof);
 
     // Trim the input
     auto trim_it =
@@ -83,7 +84,9 @@ std::unique_ptr<Token> Lexer::GetNextToken()
                      [](unsigned char ch) { return !std::isspace(ch); });
 
     // Advance the string view to ignore whitespaces
-    if (trim_it == input_to_process_.end()) return Token::CreateEof();
+    if (trim_it == input_to_process_.end())
+        return std::make_unique<Token>(TokenType::kEof);
+
     input_to_process_ =
         input_to_process_.substr(trim_it - input_to_process_.begin());
 
@@ -91,11 +94,11 @@ std::unique_ptr<Token> Lexer::GetNextToken()
     //  Check for reserved words
     if (input_to_process_.starts_with(kDefKeyword)) {
         input_to_process_ = input_to_process_.substr(kDefKeyword.size());
-        return Token::CreateDef();
+        return std::make_unique<Token>(TokenType::kDef);
     }
     if (input_to_process_.starts_with(kExternKeyword)) {
         input_to_process_ = input_to_process_.substr(kExternKeyword.size());
-        return Token::CreateExtern();
+        return std::make_unique<Token>(TokenType::kExtern);
     }
 
     const unsigned char next_char =
@@ -105,7 +108,8 @@ std::unique_ptr<Token> Lexer::GetNextToken()
         auto identifier_it =
             std::find_if(input_to_process_.begin(), input_to_process_.end(),
                          [](unsigned char ch) { return !std::isalnum(ch); });
-        auto res = Token::CreateIdentifier(
+        auto res = std::make_unique<Token>(
+            TokenType::kIdentifier,
             std::string_view(input_to_process_.data(),
                              identifier_it - input_to_process_.begin()));
 
@@ -114,7 +118,8 @@ std::unique_ptr<Token> Lexer::GetNextToken()
             input_to_process_.substr(identifier_it - input_to_process_.begin());
         return res;
     }
-    if (std::isdigit(next_char)) {}
+    if (std::isdigit(next_char)) {
+    }
 
     // // std::cout << "curr_input_pos_: " << curr_input_pos_ << '\n';
     // if (input_pos_ >= input_.cend()) return Token::CreateEof();

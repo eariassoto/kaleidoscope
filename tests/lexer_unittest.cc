@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <array>
-
 using namespace kaleidoscope;
 
 class LexerTest : public ::testing::Test
@@ -17,7 +15,7 @@ TEST_F(LexerTest, EmptyInput)
     Lexer lexer(std::string(""));
     std::unique_ptr<Token> next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
-    EXPECT_EQ(Token::Type::kEof, next_token->GetType());
+    EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
 
 TEST_F(LexerTest, EmptyInputWithSpaces)
@@ -28,7 +26,7 @@ TEST_F(LexerTest, EmptyInputWithSpaces)
     Lexer lexer(std::move(std::string(input)));
     std::unique_ptr<Token> next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
-    EXPECT_EQ(Token::Type::kEof, next_token->GetType());
+    EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
 
 TEST_F(LexerTest, Def)
@@ -42,11 +40,11 @@ TEST_F(LexerTest, Def)
     for (int i = 0; i < 4; ++i) {
         next_token = lexer.GetNextToken();
         ASSERT_TRUE(next_token) << "i=" << i;
-        EXPECT_EQ(Token::Type::kDef, next_token->GetType());
+        EXPECT_EQ(TokenType::kDef, next_token->GetType());
     }
     next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
-    EXPECT_EQ(Token::Type::kEof, next_token->GetType());
+    EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
 
 TEST_F(LexerTest, Extern)
@@ -60,11 +58,11 @@ TEST_F(LexerTest, Extern)
     for (int i = 0; i < 3; ++i) {
         next_token = lexer.GetNextToken();
         ASSERT_TRUE(next_token) << "i=" << i;
-        EXPECT_EQ(Token::Type::kExtern, next_token->GetType());
+        EXPECT_EQ(TokenType::kExtern, next_token->GetType());
     }
     next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
-    EXPECT_EQ(Token::Type::kEof, next_token->GetType());
+    EXPECT_EQ(TokenType::kEof, next_token->GetType());
 }
 
 TEST_F(LexerTest, Indentifier)
@@ -74,28 +72,28 @@ TEST_F(LexerTest, Indentifier)
 
         std::unique_ptr<Token> next_token = lexer.GetNextToken();
         ASSERT_TRUE(next_token);
-        EXPECT_EQ(Token::Type::kIdentifier, next_token->GetType());
-        EXPECT_EQ("abc12AB", next_token->GetValue<std::string_view>());
+        EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
+        EXPECT_EQ("abc12AB", next_token->GetValue());
 
         next_token = lexer.GetNextToken();
         ASSERT_TRUE(next_token);
-        EXPECT_EQ(Token::Type::kEof, next_token->GetType());
+        EXPECT_EQ(TokenType::kEof, next_token->GetType());
     }
     {
         Lexer lexer(std::string("   \r\nid1 Abc78TTTT"));
 
         std::unique_ptr<Token> next_token = lexer.GetNextToken();
         ASSERT_TRUE(next_token);
-        EXPECT_EQ(Token::Type::kIdentifier, next_token->GetType());
-        EXPECT_EQ("id1", next_token->GetValue<std::string_view>());
+        EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
+        EXPECT_EQ("id1", next_token->GetValue());
 
         next_token = lexer.GetNextToken();
         ASSERT_TRUE(next_token);
-        EXPECT_EQ(Token::Type::kIdentifier, next_token->GetType());
-        EXPECT_EQ("Abc78TTTT", next_token->GetValue<std::string_view>());
+        EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
+        EXPECT_EQ("Abc78TTTT", next_token->GetValue());
 
         next_token = lexer.GetNextToken();
         ASSERT_TRUE(next_token);
-        EXPECT_EQ(Token::Type::kEof, next_token->GetType());
+        EXPECT_EQ(TokenType::kEof, next_token->GetType());
     }
 }
