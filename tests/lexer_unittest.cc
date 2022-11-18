@@ -6,6 +6,8 @@
 
 using namespace kaleidoscope;
 
+using namespace std::literals::string_view_literals;
+
 class LexerTest : public ::testing::Test
 {
 };
@@ -72,12 +74,12 @@ TEST_F(LexerTest, ParseIdentifierTokens)
     std::unique_ptr<Token> next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
     EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
-    EXPECT_EQ("id1", next_token->GetValue());
+    EXPECT_EQ("id1"sv, next_token->GetValue());
 
     next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
     EXPECT_EQ(TokenType::kIdentifier, next_token->GetType());
-    EXPECT_EQ("Abc78TTTT", next_token->GetValue());
+    EXPECT_EQ("Abc78TTTT"sv, next_token->GetValue());
 
     next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
@@ -91,17 +93,61 @@ TEST_F(LexerTest, ParseNumberTokens)
     std::unique_ptr<Token> next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
     EXPECT_EQ(TokenType::kNumber, next_token->GetType());
-    EXPECT_EQ("1", next_token->GetValue());
+    EXPECT_EQ("1"sv, next_token->GetValue());
 
     next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
     EXPECT_EQ(TokenType::kNumber, next_token->GetType());
-    EXPECT_EQ("888734743", next_token->GetValue());
+    EXPECT_EQ("888734743"sv, next_token->GetValue());
 
     next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);
     EXPECT_EQ(TokenType::kNumber, next_token->GetType());
-    EXPECT_EQ("42", next_token->GetValue());
+    EXPECT_EQ("42"sv, next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kEof, next_token->GetType());
+}
+
+TEST_F(LexerTest, ParseNcharTokens)
+{
+    Lexer lexer(std::string("   ( ) - + * , .   "));
+
+    std::unique_ptr<Token> next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kCharacter, next_token->GetType());
+    EXPECT_EQ("("sv, next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kCharacter, next_token->GetType());
+    EXPECT_EQ(")"sv, next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kCharacter, next_token->GetType());
+    EXPECT_EQ("-"sv, next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kCharacter, next_token->GetType());
+    EXPECT_EQ("+"sv, next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kCharacter, next_token->GetType());
+    EXPECT_EQ("*"sv, next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kCharacter, next_token->GetType());
+    EXPECT_EQ(","sv, next_token->GetValue());
+
+    next_token = lexer.GetNextToken();
+    ASSERT_TRUE(next_token);
+    EXPECT_EQ(TokenType::kCharacter, next_token->GetType());
+    EXPECT_EQ("."sv, next_token->GetValue());
 
     next_token = lexer.GetNextToken();
     ASSERT_TRUE(next_token);

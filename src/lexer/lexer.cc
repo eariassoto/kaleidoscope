@@ -2,8 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <charconv>
-#include <iostream>
 
 using namespace std::literals::string_view_literals;
 
@@ -15,8 +13,8 @@ namespace
 const std::string_view kDefKeyword = "def"sv;
 const std::string_view kExternKeyword = "extern"sv;
 
-static constexpr std::array<char, 6> kAllowedCharacters{'(', ')', '+',
-                                                        '-', '*', ','};
+static constexpr std::array<char, 7> kAllowedCharacters{'(', ')', '+', '-',
+                                                        '*', ',', '.'};
 
 std::string::const_iterator AdvanceInputPos(
     const std::string::const_iterator& curr_pos,
@@ -38,7 +36,6 @@ Lexer::Lexer(std::string input)
 
 std::unique_ptr<Token> Lexer::GetNextToken()
 {
-    // std::cout << "enter GetNextToken\n";
     if (input_to_process_.empty())
         return std::make_unique<Token>(TokenType::kEof);
 
@@ -54,7 +51,6 @@ std::unique_ptr<Token> Lexer::GetNextToken()
     input_to_process_ =
         input_to_process_.substr(trim_it - input_to_process_.begin());
 
-    // std::cout << "GetNextToken: " << input_to_process_ << '\n';
     //  Check for reserved words
     if (input_to_process_.starts_with(kDefKeyword)) {
         input_to_process_ = input_to_process_.substr(kDefKeyword.size());
@@ -95,6 +91,16 @@ std::unique_ptr<Token> Lexer::GetNextToken()
         // Consume the identifier
         input_to_process_ =
             input_to_process_.substr(num_it - input_to_process_.begin());
+        return res;
+    }
+
+    // Check if the next token is a valid character
+    if (std::find(kAllowedCharacters.begin(), kAllowedCharacters.end(),
+                  next_char) != kAllowedCharacters.end()) {
+        auto res = std::make_unique<Token>(
+            TokenType::kCharacter,
+            std::string_view(input_to_process_.data(), 1));
+        input_to_process_ = input_to_process_.substr(1);
         return res;
     }
 
