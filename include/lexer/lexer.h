@@ -15,19 +15,20 @@ class Lexer
     Lexer() = delete;
     ~Lexer();
 
-    Lexer(std::string input);
+    explicit Lexer(std::string input);
+
+    Lexer(const Lexer& t) = delete;
+    Lexer& operator=(const Lexer&) = delete;
 
     std::unique_ptr<Token> GetNextToken();
 
    private:
-    void AdvanceInputPos();
-    std::string_view GetNextAlphaNum();
-    std::string_view GetNextDigit();
+    // void AdvanceInputPos();
+    // std::string_view GetNextAlphaNum();
+    // std::string_view GetNextDigit();
 
     std::string input_;
-    std::string::const_iterator input_pos_;
-
-    std::unique_ptr<Token> next_token_ = nullptr;
+    std::string_view input_to_process_;
 };
 }  // namespace kaleidoscope
 
