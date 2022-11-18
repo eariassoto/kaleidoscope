@@ -25,7 +25,7 @@ class Lexer
     std::string_view GetNextDigit();
 
     std::string input_;
-    size_t curr_input_pos_ = 0;
+    std::string::const_iterator input_pos_;
 
     std::unique_ptr<Token> next_token_ = nullptr;
 };
