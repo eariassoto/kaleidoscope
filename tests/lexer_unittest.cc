@@ -20,14 +20,13 @@ void TokensInLexerMatch(
 {
     for (size_t i = 0; i < expected_tokens.size(); ++i) {
         const auto &[type, value] = expected_tokens.at(i);
-        std::unique_ptr<Token> next_token = lexer->GetNextToken();
-        ASSERT_TRUE(next_token);
-        EXPECT_EQ(type, next_token->GetType());
-        if (value.has_value()) EXPECT_EQ(*value, next_token->GetValue());
+        Token next_token = lexer->PeekToken();
+        EXPECT_EQ(type, next_token.GetType()) << "i= " << i;
+        if (value.has_value()) EXPECT_EQ(*value, next_token.GetValue());
+        lexer->ConsumeToken();
     }
-    std::unique_ptr<Token> eof_token = lexer->GetNextToken();
-    ASSERT_TRUE(eof_token);
-    EXPECT_EQ(TokenType::kEof, eof_token->GetType());
+    Token eof_token = lexer->PeekToken();
+    EXPECT_EQ(TokenType::kEof, eof_token.GetType());
 }
 }  // namespace
 

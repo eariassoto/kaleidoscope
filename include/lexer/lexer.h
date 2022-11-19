@@ -4,8 +4,9 @@
 #include "lexer/token.h"
 
 #include <memory>
-#include <string>
+#include <optional>
 #include <string_view>
+#include <string>
 
 namespace kaleidoscope
 {
@@ -20,11 +21,14 @@ class Lexer
     Lexer(const Lexer& t) = delete;
     Lexer& operator=(const Lexer&) = delete;
 
-    std::unique_ptr<Token> GetNextToken();
+    Token PeekToken();
+    void ConsumeToken();
 
    private:
     std::string input_;
     std::string_view input_to_process_;
+
+    std::unique_ptr<Token> next_token_ = nullptr;
 };
 }  // namespace kaleidoscope
 

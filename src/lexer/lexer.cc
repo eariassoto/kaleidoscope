@@ -34,31 +34,39 @@ Lexer::Lexer(std::string input)
 {
 }
 
-std::unique_ptr<Token> Lexer::GetNextToken()
-{
-    if (input_to_process_.empty())
-        return std::make_unique<Token>(TokenType::kEof);
+Lexer::~Lexer() = default;
 
+Token Lexer::PeekToken()
+{
+    if (next_token_) return *next_token_;
+
+    if (input_to_process_.empty()) {
+        next_token_ = std::make_unique<Token>(TokenType::kEof);
+        return *next_token_;
+    }
     // Trim the input
     auto trim_it =
         std::find_if(input_to_process_.begin(), input_to_process_.end(),
                      [](unsigned char ch) { return !std::isspace(ch); });
 
     // Advance the string view to ignore whitespaces
-    if (trim_it == input_to_process_.end())
-        return std::make_unique<Token>(TokenType::kEof);
-
+    if (trim_it == input_to_process_.end()) {
+        next_token_ = std::make_unique<Token>(TokenType::kEof);
+        return *next_token_;
+    }
     input_to_process_ =
         input_to_process_.substr(trim_it - input_to_process_.begin());
 
     //  Check for reserved words
     if (input_to_process_.starts_with(kDefKeyword)) {
         input_to_process_ = input_to_process_.substr(kDefKeyword.size());
-        return std::make_unique<Token>(TokenType::kDef);
+        next_token_ = std::make_unique<Token>(TokenType::kDef);
+        return *next_token_;
     }
     if (input_to_process_.starts_with(kExternKeyword)) {
         input_to_process_ = input_to_process_.substr(kExternKeyword.size());
-        return std::make_unique<Token>(TokenType::kExtern);
+        next_token_ = std::make_unique<Token>(TokenType::kExtern);
+        return *next_token_;
     }
 
     const unsigned char next_char =
@@ -68,7 +76,7 @@ std::unique_ptr<Token> Lexer::GetNextToken()
         auto identifier_it =
             std::find_if(input_to_process_.begin(), input_to_process_.end(),
                          [](unsigned char ch) { return !std::isalnum(ch); });
-        auto res = std::make_unique<Token>(
+        next_token_ = std::make_unique<Token>(
             TokenType::kIdentifier,
             std::string_view(input_to_process_.data(),
                              identifier_it - input_to_process_.begin()));
@@ -76,14 +84,15 @@ std::unique_ptr<Token> Lexer::GetNextToken()
         // Consume the identifier
         input_to_process_ =
             input_to_process_.substr(identifier_it - input_to_process_.begin());
-        return res;
+        return *next_token_;
     }
+
     if (std::isdigit(next_char)) {
         // Find the last consecutive digit character
         auto num_it =
             std::find_if(input_to_process_.begin(), input_to_process_.end(),
                          [](unsigned char ch) { return !std::isdigit(ch); });
-        auto res = std::make_unique<Token>(
+        next_token_ = std::make_unique<Token>(
             TokenType::kNumber,
             std::string_view(input_to_process_.data(),
                              num_it - input_to_process_.begin()));
@@ -91,23 +100,32 @@ std::unique_ptr<Token> Lexer::GetNextToken()
         // Consume the identifier
         input_to_process_ =
             input_to_process_.substr(num_it - input_to_process_.begin());
-        return res;
+        return *next_token_;
     }
 
     // Check if the next token is a valid character
     if (std::find(kAllowedCharacters.begin(), kAllowedCharacters.end(),
                   next_char) != kAllowedCharacters.end()) {
-        auto res = std::make_unique<Token>(
+        next_token_ = std::make_unique<Token>(
             TokenType::kCharacter,
             std::string_view(input_to_process_.data(), 1));
         input_to_process_ = input_to_process_.substr(1);
-        return res;
+        return *next_token_;
     }
 
     // TODO: Handle invalid case
-    return nullptr;
+    throw std::invalid_argument("");
 }
 
-Lexer::~Lexer() = default;
+void Lexer::ConsumeToken()
+{
+    // If token has not been peeked, do it and continue
+    if (!next_token_) PeekToken();
+
+    // Do not advance if EOF has been reached
+    if (next_token_->GetType() == TokenType::kEof) return;
+
+    next_token_.reset();
+}
 
 }  // namespace kaleidoscope
