@@ -12,6 +12,8 @@ namespace kaleidoscope
 {
 
 class Lexer;
+enum class TokenType;
+class Token;
 
 class Parser
 {
@@ -22,27 +24,30 @@ class Parser
     ~Parser();
 
     std::unique_ptr<ast::Expression> ParseNextExpression();
-    // std::unique_ptr<ast::Fn> ParseNextTopLevelExpression();
+    std::unique_ptr<ast::Fn> ParseNextTopLevelExpression();
 
    private:
     std::unique_ptr<Lexer> lexer_;
 
    private:
-   bool IsNextToken(TokenType type);
-    // void AdvanceToNextToken();
-    // int GetCurrBinOpTokenPrecedence() const;
+    Token PeekToken();
+    void ConsumeToken();
 
-    // std::unique_ptr<ast::Expression> ParseNumberExpression();
-    // std::unique_ptr<ast::Expression> ParseParenthesesExpression();
-    // std::unique_ptr<ast::Expression> ParseIdentifierExpression();
-    // std::unique_ptr<ast::Expression> ParsePrimaryExpression();
-    // std::unique_ptr<ast::Expression> ParseExpression();
-    // std::unique_ptr<ast::Expression> ParseBinaryOpRhs(
-    //     int expression_precedence,
-    //     std::unique_ptr<ast::Expression> lhs_expression);
-    // std::unique_ptr<ast::FnPrototype> ParsePrototype();
-    // std::unique_ptr<ast::Fn> ParseDefinition();
-    // std::unique_ptr<ast::FnPrototype> ParseExtern();
+    bool IsNextToken(TokenType type);
+    bool IsNextTokenCharacter(char ch);
+    bool IsNextTokenBinOp();
+
+    std::unique_ptr<ast::Fn> ParseDefinition();
+    std::unique_ptr<ast::FnPrototype> ParseExtern();
+    std::unique_ptr<ast::FnPrototype> ParsePrototype();
+    std::unique_ptr<ast::Expression> ParseExpression();
+    std::unique_ptr<ast::Expression> ParsePrimaryExpression();
+    std::unique_ptr<ast::Expression> ParseBinaryOpRhs(
+        int expression_precedence,
+        std::unique_ptr<ast::Expression> lhs_expression);
+    std::unique_ptr<ast::Expression> ParseParenthesesExpression();
+    std::unique_ptr<ast::Expression> ParseIdentifierExpression();
+    std::unique_ptr<ast::Expression> ParseNumberExpression();
 };
 }  // namespace kaleidoscope
 
