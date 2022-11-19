@@ -7,6 +7,7 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS
   "${Kaleidoscope_SOURCE_DIR}/include/ast/fn.h"
   "${Kaleidoscope_SOURCE_DIR}/include/ast/number.h"
   "${Kaleidoscope_SOURCE_DIR}/include/ast/variable.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/lexer/lexer_error.h"
   "${Kaleidoscope_SOURCE_DIR}/include/lexer/lexer.h"
   "${Kaleidoscope_SOURCE_DIR}/include/lexer/token.h"
   # TODO: re-enable this
@@ -20,6 +21,7 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
   "ast/fn.cc"
   "ast/number.cc"
   "ast/variable.cc"
+  "lexer/lexer_error.cc"
   "lexer/lexer.cc"
   "lexer/token.cc"
   # TODO: re-enable this

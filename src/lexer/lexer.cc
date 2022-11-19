@@ -1,5 +1,7 @@
 #include "lexer/lexer.h"
 
+#include "lexer/lexer_error.h"
+
 #include <algorithm>
 #include <array>
 
@@ -38,6 +40,8 @@ Lexer::~Lexer() = default;
 
 Token Lexer::PeekToken()
 {
+    if (error_found_) throw LexerError(input_to_process_.front());
+
     if (next_token_) return *next_token_;
 
     if (input_to_process_.empty()) {
@@ -113,12 +117,15 @@ Token Lexer::PeekToken()
         return *next_token_;
     }
 
-    // TODO: Handle invalid case
-    throw std::invalid_argument("");
+    // Invalid character, throw error
+    error_found_ = true;
+    throw LexerError(next_char);
 }
 
 void Lexer::ConsumeToken()
 {
+    if (error_found_) return;
+
     // If token has not been peeked, do it and continue
     if (!next_token_) PeekToken();
 

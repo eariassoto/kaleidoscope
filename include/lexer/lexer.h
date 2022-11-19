@@ -10,6 +10,7 @@
 
 namespace kaleidoscope
 {
+
 class Lexer
 {
    public:
@@ -28,6 +29,7 @@ class Lexer
     std::string input_;
     std::string_view input_to_process_;
 
+    bool error_found_ = false;
     std::unique_ptr<Token> next_token_ = nullptr;
 };
 }  // namespace kaleidoscope
