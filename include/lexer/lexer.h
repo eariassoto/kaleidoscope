@@ -23,10 +23,6 @@ class Lexer
     std::unique_ptr<Token> GetNextToken();
 
    private:
-    // void AdvanceInputPos();
-    // std::string_view GetNextAlphaNum();
-    // std::string_view GetNextDigit();
-
     std::string input_;
     std::string_view input_to_process_;
 };

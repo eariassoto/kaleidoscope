@@ -13,6 +13,6 @@ add_executable(unittests
 
 target_compile_features(unittests PRIVATE cxx_std_20)
 
-target_link_libraries(unittests PRIVATE kaleidoscope gtest)
+target_link_libraries(unittests PRIVATE kaleidoscope gtest fmt)
 
 add_test(NAME unittests COMMAND unittests)
