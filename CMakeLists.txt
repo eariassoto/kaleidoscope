@@ -28,8 +28,7 @@ FetchContent_MakeAvailable(fmtlib)
 
 add_subdirectory(src)
 
-# TODO: re-enable this
-# add_subdirectory(apps)
+add_subdirectory(apps)
 
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
    AND BUILD_TESTING)

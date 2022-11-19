@@ -10,8 +10,7 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS
   "${Kaleidoscope_SOURCE_DIR}/include/lexer/lexer_error.h"
   "${Kaleidoscope_SOURCE_DIR}/include/lexer/lexer.h"
   "${Kaleidoscope_SOURCE_DIR}/include/lexer/token.h"
-  # TODO: re-enable this
-  #"${Kaleidoscope_SOURCE_DIR}/include/parser/parser.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/parser/parser.h"
 )
 
 file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
@@ -24,8 +23,7 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
   "lexer/lexer_error.cc"
   "lexer/lexer.cc"
   "lexer/token.cc"
-  # TODO: re-enable this
-  #"parser/parser.cc"
+  "parser/parser.cc"
 )
 
 add_library(kaleidoscope ${SOURCE_LIST} ${HEADER_LIST})
