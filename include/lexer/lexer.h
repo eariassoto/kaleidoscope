@@ -1,15 +1,14 @@
 #ifndef LEXER_LEXER_H
 #define LEXER_LEXER_H
 
-#include "lexer/token.h"
-
-#include <memory>
 #include <optional>
 #include <string_view>
 #include <string>
 
 namespace kaleidoscope
 {
+
+enum class Token;
 
 class Lexer
 {
@@ -23,6 +22,8 @@ class Lexer
     Lexer& operator=(const Lexer&) = delete;
 
     Token PeekToken();
+    std::string_view PeekTokenValue();
+
     void ConsumeToken();
 
    private:
@@ -30,7 +31,8 @@ class Lexer
     std::string_view input_to_process_;
 
     bool error_found_ = false;
-    std::unique_ptr<Token> next_token_ = nullptr;
+    std::optional<Token> next_token_ = std::nullopt;
+    std::string_view next_token_value_ = std::string_view(nullptr, 0);
 };
 }  // namespace kaleidoscope
 

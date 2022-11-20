@@ -8,8 +8,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(unittests
-  "lexer_unittest.cc"
-  "token_unittest.cc")
+  "lexer_unittest.cc")
 
 target_compile_features(unittests PRIVATE cxx_std_20)
 

@@ -5,33 +5,25 @@
 
 namespace kaleidoscope
 {
-enum class TokenType {
+enum class Token {
     kEof,
 
     // reserved words
     kDef,
     kExtern,
 
+    // variable values
     kIdentifier,
     kNumber,
-    kCharacter
-};
 
-class Token
-{
-   public:
-    Token() = delete;
-    explicit Token(TokenType type);
-    Token(TokenType type, std::string_view value);
-
-    ~Token();
-
-    TokenType GetType() const;
-    [[nodiscard]] std::string_view GetValue() const;
-
-   private:
-    TokenType type_;
-    std::string_view value_ = std::string_view(nullptr, 0);
+    // characters
+    kLeftParen,
+    kRightParen,
+    kPlusSign,
+    kMinusSign,
+    kAsterisk,
+    kComma,
+    kDot
 };
 
 }  // namespace kaleidoscope
