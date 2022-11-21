@@ -1,5 +1,5 @@
-#ifndef LEXER_PARSER_H
-#define LEXER_PARSER_H
+#ifndef KALEIDOSCOPE_PARSER_H
+#define KALEIDOSCOPE_PARSER_H
 
 #include "ast/expression.h"
 #include "ast/fn.h"
@@ -46,4 +46,4 @@ class Parser
 };
 }  // namespace kaleidoscope
 
-#endif  // LEXER_PARSER_H
+#endif // KALEIDOSCOPE_PARSER_H

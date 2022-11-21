@@ -1,5 +1,5 @@
-#ifndef AST_VARIABLE_H
-#define AST_VARIABLE_H
+#ifndef KALEIDOSCOPE_AST_VARIABLE_H
+#define KALEIDOSCOPE_AST_VARIABLE_H
 
 #include "kaleidoscope/ast/expression.h"
 
@@ -18,4 +18,4 @@ struct Variable : public Expression {
 
 }  // namespace kaleidoscope::ast
 
-#endif  // AST_VARIABLE_H
+#endif // KALEIDOSCOPE_AST_VARIABLE_H

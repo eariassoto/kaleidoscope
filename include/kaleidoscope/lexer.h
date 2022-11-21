@@ -1,5 +1,5 @@
-#ifndef LEXER_LEXER_H
-#define LEXER_LEXER_H
+#ifndef KALEIDOSCOPE_LEXER_H
+#define KALEIDOSCOPE_LEXER_H
 
 #include <optional>
 #include <string_view>
@@ -36,4 +36,4 @@ class Lexer
 };
 }  // namespace kaleidoscope
 
-#endif  // LEXER_LEXER_H
+#endif // KALEIDOSCOPE_LEXER_H

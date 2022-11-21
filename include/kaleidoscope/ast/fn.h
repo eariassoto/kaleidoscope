@@ -1,5 +1,5 @@
-#ifndef AST_FN_H
-#define AST_FN_H
+#ifndef KALEIDOSCOPE_AST_FN_H
+#define KALEIDOSCOPE_AST_FN_H
 
 #include "kaleidoscope/ast/fn_prototype.h"
 #include "kaleidoscope/ast/expression.h"
@@ -21,4 +21,4 @@ struct Fn : public Expression {
 
 }  // namespace kaleidoscope::ast
 
-#endif  // AST_FN_H
+#endif // KALEIDOSCOPE_AST_FN_H

@@ -1,5 +1,5 @@
-#ifndef AST_FN_CALL_H
-#define AST_FN_CALL_H
+#ifndef KALEIDOSCOPE_AST_FN_CALL_H
+#define KALEIDOSCOPE_AST_FN_CALL_H
 
 #include "kaleidoscope/ast/expression.h"
 
@@ -22,4 +22,4 @@ struct FnCall : public Expression {
 
 }  // namespace kaleidoscope::ast
 
-#endif  // AST_FN_CALL_H
+#endif // KALEIDOSCOPE_AST_FN_CALL_H

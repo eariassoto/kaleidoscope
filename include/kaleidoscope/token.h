@@ -1,5 +1,5 @@
-#ifndef LEXER_TOKEN_H
-#define LEXER_TOKEN_H
+#ifndef KALEIDOSCOPE_TOKEN_H
+#define KALEIDOSCOPE_TOKEN_H
 
 #include <string_view>
 
@@ -28,4 +28,4 @@ enum class Token {
 
 }  // namespace kaleidoscope
 
-#endif  // LEXER_TOKEN_H
+#endif // KALEIDOSCOPE_TOKEN_H

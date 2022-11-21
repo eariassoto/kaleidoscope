@@ -1,5 +1,5 @@
-#ifndef AST_BINARY_OP_H
-#define AST_BINARY_OP_H
+#ifndef KALEIDOSCOPE_AST_BINARY_OP_H
+#define KALEIDOSCOPE_AST_BINARY_OP_H
 
 #include "kaleidoscope/ast/expression.h"
 
@@ -21,4 +21,4 @@ struct BinaryOp : public Expression {
 
 }  // namespace kaleidoscope::ast
 
-#endif  // AST_BINARY_OP_H
+#endif // KALEIDOSCOPE_AST_BINARY_OP_H

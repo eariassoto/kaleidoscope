@@ -1,5 +1,5 @@
-#ifndef LEXER_LEXER_ERROR_H
-#define LEXER_LEXER_ERROR_H
+#ifndef KALEIDOSCOPE_LEXER_ERROR_H
+#define KALEIDOSCOPE_LEXER_ERROR_H
 
 #include <exception>
 #include <string>
@@ -24,4 +24,4 @@ class LexerError : public std::exception
 };
 }  // namespace kaleidoscope
 
-#endif  // LEXER_LEXER_ERROR_H
+#endif // #define KALEIDOSCOPE_LEXER_ERROR_H

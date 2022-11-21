@@ -1,5 +1,5 @@
-#ifndef AST_NUMBER_H
-#define AST_NUMBER_H
+#ifndef KALEIDOSCOPE_AST_NUMBER_H
+#define KALEIDOSCOPE_AST_NUMBER_H
 
 #include "kaleidoscope/ast/expression.h"
 
@@ -16,4 +16,4 @@ struct Number : public Expression {
 
 }  // namespace kaleidoscope::ast
 
-#endif  // AST_NUMBER_H
+#endif // KALEIDOSCOPE_AST_NUMBER_H

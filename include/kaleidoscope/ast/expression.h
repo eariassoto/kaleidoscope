@@ -1,5 +1,5 @@
-#ifndef AST_EXPRESSION_H
-#define AST_EXPRESSION_H
+#ifndef KALEIDOSCOPE_AST_EXPRESSION_H
+#define KALEIDOSCOPE_AST_EXPRESSION_H
 
 #include <string>
 
@@ -17,4 +17,4 @@ class Expression
 
 }  // namespace kaleidoscope::ast
 
-#endif  // AST_EXPRESSION_H
+#endif // KALEIDOSCOPE_AST_EXPRESSION_H
