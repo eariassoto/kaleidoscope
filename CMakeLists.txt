@@ -5,7 +5,7 @@ project(
     Kaleidoscope
     VERSION 1.0.0
     DESCRIPTION "Simple LLVM Frontend tutorial."
-    LANGUAGES CXX)
+    LANGUAGES C CXX)
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -25,6 +25,15 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
   GIT_TAG 9.0.0)
 FetchContent_MakeAvailable(fmtlib)
+
+find_package(LLVM REQUIRED CONFIG)
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+include_directories(${LLVM_INCLUDE_DIRS})
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+add_definitions(${LLVM_DEFINITIONS_LIST})
 
 add_subdirectory(src)
 

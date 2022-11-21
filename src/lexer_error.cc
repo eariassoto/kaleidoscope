@@ -1,4 +1,4 @@
-#include "lexer/lexer_error.h"
+#include "kaleidoscope/lexer_error.h"
 
 #include <fmt/core.h>
 

@@ -1,6 +1,6 @@
-#include "lexer/lexer.h"
+#include "kaleidoscope/lexer.h"
 
-#include "lexer/token.h"
+#include "kaleidoscope/token.h"
 
 #include <gtest/gtest.h>
 

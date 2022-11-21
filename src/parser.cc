@@ -1,14 +1,14 @@
-#include "parser/parser.h"
+#include "kaleidoscope/parser.h"
 
-#include "ast/binary_op.h"
-#include "ast/fn_call.h"
-#include "ast/fn_prototype.h"
-#include "ast/fn.h"
-#include "ast/number.h"
-#include "ast/variable.h"
-#include "lexer/lexer_error.h"
-#include "lexer/lexer.h"
-#include "lexer/token.h"
+#include "kaleidoscope/ast/binary_op.h"
+#include "kaleidoscope/ast/fn_call.h"
+#include "kaleidoscope/ast/fn_prototype.h"
+#include "kaleidoscope/ast/fn.h"
+#include "kaleidoscope/ast/number.h"
+#include "kaleidoscope/ast/variable.h"
+#include "kaleidoscope/lexer_error.h"
+#include "kaleidoscope/lexer.h"
+#include "kaleidoscope/token.h"
 
 #include <charconv>
 #include <iostream>

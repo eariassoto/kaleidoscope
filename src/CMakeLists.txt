@@ -20,10 +20,10 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
   "ast/fn.cc"
   "ast/number.cc"
   "ast/variable.cc"
-  "lexer/lexer_error.cc"
-  "lexer/lexer.cc"
-  "lexer/token.cc"
-  "parser/parser.cc"
+  "lexer_error.cc"
+  "lexer.cc"
+  "parser.cc"
+  "token.cc"
 )
 
 add_library(kaleidoscope ${SOURCE_LIST} ${HEADER_LIST})
@@ -32,7 +32,8 @@ target_include_directories(kaleidoscope PUBLIC ../include)
 
 target_compile_features(kaleidoscope PUBLIC cxx_std_20)
 
-target_link_libraries(kaleidoscope PUBLIC fmt)
+llvm_map_components_to_libnames(llvm_libs core)
+target_link_libraries(kaleidoscope PUBLIC fmt ${llvm_libs})
 
 source_group(
   TREE "${PROJECT_SOURCE_DIR}/include"

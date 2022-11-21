@@ -1,4 +1,4 @@
-#include "ast/number.h"
+#include "kaleidoscope/ast/number.h"
 
 #include <fmt/core.h>
 

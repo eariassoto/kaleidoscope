@@ -1,7 +1,7 @@
 #ifndef AST_FN_CALL_H
 #define AST_FN_CALL_H
 
-#include "ast/expression.h"
+#include "kaleidoscope/ast/expression.h"
 
 #include <memory>
 #include <string_view>

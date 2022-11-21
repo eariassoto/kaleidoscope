@@ -1,7 +1,7 @@
-#include "lexer/lexer.h"
+#include "kaleidoscope/lexer.h"
 
-#include "lexer/lexer_error.h"
-#include "lexer/token.h"
+#include "kaleidoscope/lexer_error.h"
+#include "kaleidoscope/token.h"
 
 #include <algorithm>
 #include <array>

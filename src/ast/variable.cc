@@ -1,4 +1,4 @@
-#include "ast/variable.h"
+#include "kaleidoscope/ast/variable.h"
 
 #include <fmt/core.h>
 

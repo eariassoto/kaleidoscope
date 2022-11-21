@@ -1,4 +1,4 @@
-#include "ast/fn.h"
+#include "kaleidoscope/ast/fn.h"
 
 #include <fmt/core.h>
 

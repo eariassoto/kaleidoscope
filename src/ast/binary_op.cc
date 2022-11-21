@@ -1,4 +1,4 @@
-#include "ast/binary_op.h"
+#include "kaleidoscope/ast/binary_op.h"
 
 #include <fmt/core.h>
 

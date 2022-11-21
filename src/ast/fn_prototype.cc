@@ -1,4 +1,4 @@
-#include "ast/fn_prototype.h"
+#include "kaleidoscope/ast/fn_prototype.h"
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>

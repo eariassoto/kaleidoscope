@@ -1,7 +1,7 @@
 #ifndef AST_BINARY_OP_H
 #define AST_BINARY_OP_H
 
-#include "ast/expression.h"
+#include "kaleidoscope/ast/expression.h"
 
 #include <memory>
 

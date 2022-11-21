@@ -1,7 +1,7 @@
 #ifndef AST_NUMBER_H
 #define AST_NUMBER_H
 
-#include "ast/expression.h"
+#include "kaleidoscope/ast/expression.h"
 
 namespace kaleidoscope::ast
 {

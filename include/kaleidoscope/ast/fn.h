@@ -1,8 +1,8 @@
 #ifndef AST_FN_H
 #define AST_FN_H
 
-#include "ast/fn_prototype.h"
-#include "ast/expression.h"
+#include "kaleidoscope/ast/fn_prototype.h"
+#include "kaleidoscope/ast/expression.h"
 
 #include <memory>
 
