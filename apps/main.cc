@@ -7,7 +7,8 @@
 
 int main()
 {
-    kaleidoscope::JitInterpreter interpreter;
+    using namespace kaleidoscope;
+    JitInterpreter interpreter;
 
     while (true) {
         std::cout << "Eval > ";
@@ -15,11 +16,10 @@ int main()
         getline(std::cin, input);
         if (input == "quit") break;
 
-        auto lexer = std::make_unique<kaleidoscope::Lexer>(std::move(input));
-        kaleidoscope::Parser parser(std::move(lexer));
-        if (auto expr = parser.ParseNextExpression()) {
-            if (auto number =
-                    dynamic_cast<kaleidoscope::ast::Number*>(expr.get())) {
+        Parser parser(std::make_unique<Lexer>(std::move(input)));
+        if (std::unique_ptr<ast::Expression> expr =
+                parser.ParseNextExpression()) {
+            if (ast::Number* number = dynamic_cast<ast::Number*>(expr.get())) {
                 interpreter.GenerateIR(*number);
                 // ugly, fix
                 std::cout << '\n';
