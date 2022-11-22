@@ -1,11 +1,14 @@
 #include <kaleidoscope/lexer.h>
 #include <kaleidoscope/parser.h>
+#include <kaleidoscope/jit_interpreter.h>
 
 #include <iostream>
 
 
 int main()
 {
+    kaleidoscope::JitInterpreter interpreter;
+    
     while (true) {
         std::cout << "Eval > ";
         std::string input;

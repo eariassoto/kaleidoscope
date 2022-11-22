@@ -1,16 +1,17 @@
 # Copyright 2022 Emmanuel Arias Soto
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS
-  "${Kaleidoscope_SOURCE_DIR}/include/ast/binary_op.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/ast/expression.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/ast/fn_call.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/ast/fn_prototype.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/ast/fn.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/ast/number.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/ast/variable.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/lexer/lexer_error.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/lexer/lexer.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/lexer/token.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/parser/parser.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/binary_op.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/expression.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/fn_call.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/fn_prototype.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/fn.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/number.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/variable.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/jit_interpreter.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/lexer_error.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/lexer.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/parser.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/token.h"
 )
 
 file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
@@ -20,6 +21,7 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
   "ast/fn.cc"
   "ast/number.cc"
   "ast/variable.cc"
+  "jit_interpreter.cc"
   "lexer_error.cc"
   "lexer.cc"
   "parser.cc"
