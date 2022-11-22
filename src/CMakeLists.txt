@@ -34,8 +34,10 @@ target_include_directories(kaleidoscope PUBLIC ../include)
 
 target_compile_features(kaleidoscope PUBLIC cxx_std_20)
 
+target_link_libraries(kaleidoscope PUBLIC fmt)
+
 llvm_map_components_to_libnames(llvm_libs core)
-target_link_libraries(kaleidoscope PUBLIC fmt ${llvm_libs})
+target_link_libraries(kaleidoscope PRIVATE ${llvm_libs})
 
 source_group(
   TREE "${PROJECT_SOURCE_DIR}/include"
