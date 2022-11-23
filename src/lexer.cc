@@ -71,14 +71,14 @@ Token Lexer::PeekToken()
         input_to_process_.substr(trim_it - input_to_process_.begin());
 
     //  Check for reserved words
-    if (input_to_process_.starts_with(kDefKeyword)) {
+    if (input_to_process_.substr(0, kDefKeyword.size()) == kDefKeyword) {
         next_token_ = Token::kDef;
         next_token_value_ =
             std::string_view(input_to_process_.data(), kDefKeyword.size());
         input_to_process_ = input_to_process_.substr(kDefKeyword.size());
         return *next_token_;
     }
-    if (input_to_process_.starts_with(kExternKeyword)) {
+    if (input_to_process_.substr(0, kExternKeyword.size()) == kExternKeyword) {
         next_token_ = Token::kExtern;
         next_token_value_ =
             std::string_view(input_to_process_.data(), kExternKeyword.size());
