@@ -17,14 +17,14 @@ namespace
 const std::string_view kDefKeyword = "def"sv;
 const std::string_view kExternKeyword = "extern"sv;
 
-static constexpr std::array<std::pair<unsigned char, Token>, 7>
-    kAllowedCharacters{{{'(', Token::kLeftParen},
-                        {')', Token::kRightParen},
-                        {'+', Token::kPlusSign},
-                        {'-', Token::kMinusSign},
-                        {'*', Token::kAsterisk},
-                        {',', Token::kComma},
-                        {'.', Token::kDot}}};
+static constexpr std::array<std::pair<unsigned char, TokenType>, 7>
+    kAllowedCharacters{{{'(', TokenType::kLeftParen},
+                        {')', TokenType::kRightParen},
+                        {'+', TokenType::kPlusSign},
+                        {'-', TokenType::kMinusSign},
+                        {'*', TokenType::kAsterisk},
+                        {',', TokenType::kComma},
+                        {'.', TokenType::kDot}}};
 
 std::string::const_iterator AdvanceInputPos(
     const std::string::const_iterator& curr_pos,
@@ -50,11 +50,11 @@ Token Lexer::PeekToken()
 {
     if (error_found_) throw LexerError(input_to_process_.front());
 
-    if (next_token_) return *next_token_;
+    if (next_token_) return next_token_.value();
 
     if (input_to_process_.empty()) {
-        next_token_ = Token::kEof;
-        return *next_token_;
+        next_token_.emplace(TokenType::kEof, std::string_view());
+        return next_token_.value();
     }
     // Trim the input
     auto trim_it =
@@ -62,9 +62,8 @@ Token Lexer::PeekToken()
                      [](unsigned char ch) { return !std::isspace(ch); });
 
     if (trim_it == input_to_process_.end()) {
-        next_token_ = Token::kEof;
-        next_token_value_ = std::string_view(nullptr, 0);
-        return *next_token_;
+        next_token_.emplace(TokenType::kEof, std::string_view());
+        return next_token_.value();
     }
     // Advance the string view to ignore whitespaces
     input_to_process_ =
@@ -72,18 +71,18 @@ Token Lexer::PeekToken()
 
     //  Check for reserved words
     if (input_to_process_.substr(0, kDefKeyword.size()) == kDefKeyword) {
-        next_token_ = Token::kDef;
-        next_token_value_ =
-            std::string_view(input_to_process_.data(), kDefKeyword.size());
+        next_token_.emplace(
+            TokenType::kDef,
+            std::string_view(input_to_process_.data(), kDefKeyword.size()));
         input_to_process_ = input_to_process_.substr(kDefKeyword.size());
-        return *next_token_;
+        return next_token_.value();
     }
     if (input_to_process_.substr(0, kExternKeyword.size()) == kExternKeyword) {
-        next_token_ = Token::kExtern;
-        next_token_value_ =
-            std::string_view(input_to_process_.data(), kExternKeyword.size());
+        next_token_.emplace(
+            TokenType::kExtern,
+            std::string_view(input_to_process_.data(), kExternKeyword.size()));
         input_to_process_ = input_to_process_.substr(kExternKeyword.size());
-        return *next_token_;
+        return next_token_.value();
     }
 
     const unsigned char next_char =
@@ -95,14 +94,14 @@ Token Lexer::PeekToken()
                          [](unsigned char ch) { return !std::isalnum(ch); });
 
         const size_t value_size = identifier_it - input_to_process_.begin();
-        next_token_ = Token::kIdentifier;
-        next_token_value_ =
-            std::string_view(input_to_process_.data(), value_size);
+        next_token_.emplace(
+            TokenType::kIdentifier,
+            std::string_view(input_to_process_.data(), value_size));
 
         // Consume the identifier
         input_to_process_ = input_to_process_.substr(value_size);
 
-        return *next_token_;
+        return next_token_.value();
     }
 
     if (std::isdigit(next_char)) {
@@ -112,14 +111,14 @@ Token Lexer::PeekToken()
                          [](unsigned char ch) { return !std::isdigit(ch); });
 
         const size_t value_size = num_it - input_to_process_.begin();
-        next_token_ = Token::kNumber;
-        next_token_value_ =
-            std::string_view(input_to_process_.data(), value_size);
+        next_token_.emplace(
+            TokenType::kNumber,
+            std::string_view(input_to_process_.data(), value_size));
 
         // Consume the identifier
         input_to_process_ = input_to_process_.substr(value_size);
 
-        return *next_token_;
+        return next_token_.value();
     }
 
     // Check if the next token is a valid character
@@ -127,25 +126,17 @@ Token Lexer::PeekToken()
             kAllowedCharacters.begin(), kAllowedCharacters.end(),
             [&next_char](const auto& p) { return p.first == next_char; });
         it != kAllowedCharacters.end()) {
-        next_token_ = (*it).second;
-        next_token_value_ = std::string_view(input_to_process_.data(), 1);
+        next_token_.emplace((*it).second,
+                            std::string_view(input_to_process_.data(), 1));
 
         input_to_process_ = input_to_process_.substr(1);
 
-        return *next_token_;
+        return next_token_.value();
     }
 
     // Invalid character, throw error
     error_found_ = true;
     throw LexerError(next_char);
-}
-
-std::string_view Lexer::PeekTokenValue()
-{
-    // If token has not been peeked, do it and continue
-    if (!next_token_) PeekToken();
-
-    return next_token_value_;
 }
 
 void Lexer::ConsumeToken()
@@ -154,7 +145,7 @@ void Lexer::ConsumeToken()
     if (!next_token_) PeekToken();
 
     // Do not advance if EOF has been reached
-    if (*next_token_ == Token::kEof) return;
+    if (next_token_->Type == TokenType::kEof) return;
 
     next_token_.reset();
 }

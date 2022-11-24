@@ -17,6 +17,7 @@ int main()
             std::string input;
             getline(std::cin, input);
             if (input == "quit") break;
+            if (input.empty()) continue;
 
             Parser parser(std::make_unique<Lexer>(std::move(input)));
             if (std::unique_ptr<ast::Expression> expr =

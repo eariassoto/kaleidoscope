@@ -12,7 +12,7 @@ namespace kaleidoscope
 {
 
 class Lexer;
-enum class Token;
+enum class TokenType;
 
 class Parser
 {
@@ -29,7 +29,7 @@ class Parser
     std::unique_ptr<Lexer> lexer_;
 
    private:
-    bool IsNextToken(Token type);
+    bool IsNextToken(TokenType type);
     bool IsNextTokenBinOp();
 
     std::unique_ptr<ast::Fn> ParseDefinition();

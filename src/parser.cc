@@ -45,10 +45,12 @@ Parser::Parser(std::unique_ptr<Lexer> lexer) : lexer_(std::move(lexer)) {}
 
 Parser::~Parser() = default;
 
-bool Parser::IsNextToken(Token type)
+bool Parser::IsNextToken(TokenType type)
 {
     try {
-        return lexer_->PeekToken() == type;
+        const Token t = lexer_->PeekToken();
+        std::cout << "IsNextToken " << TokenTypeToString(t.Type) << '\n';
+        return t.Type == type;
     } catch (const LexerError& err) {
         return false;
     }
@@ -56,8 +58,9 @@ bool Parser::IsNextToken(Token type)
 
 bool Parser::IsNextTokenBinOp()
 {
-    return IsNextToken(Token::kPlusSign) || IsNextToken(Token::kMinusSign) ||
-           IsNextToken(Token::kAsterisk);
+    return IsNextToken(TokenType::kPlusSign) ||
+           IsNextToken(TokenType::kMinusSign) ||
+           IsNextToken(TokenType::kAsterisk);
 }
 
 /// toplevelexpr ::= expression
@@ -78,16 +81,16 @@ std::unique_ptr<ast::Fn> Parser::ParseNextTopLevelExpression()
 /// top ::= definition | external | expression
 std::unique_ptr<ast::Expression> Parser::ParseNextExpression()
 {
-    if (IsNextToken(Token::kEof)) {
+    if (IsNextToken(TokenType::kEof)) {
         return nullptr;
-    } else if (IsNextToken(Token::kEof)) {
+    } else if (IsNextToken(TokenType::kDef)) {
         if (auto def = ParseDefinition()) {
             return def;
         }
         // Skip token for error recovery.
         lexer_->ConsumeToken();
         return nullptr;
-    } else if (IsNextToken(Token::kExtern)) {
+    } else if (IsNextToken(TokenType::kExtern)) {
         if (auto ext = ParseExtern()) {
             return ext;
         }
@@ -126,21 +129,26 @@ std::unique_ptr<ast::FnPrototype> Parser::ParseExtern()
 ///   ::= id '(' id* ')'
 std::unique_ptr<ast::FnPrototype> Parser::ParsePrototype()
 {
-    if (!IsNextToken(Token::kIdentifier))
+    if (!IsNextToken(TokenType::kIdentifier))
         return LogErrorP("Expected function name in prototype");
 
-    const std::string_view fn_name = lexer_->PeekTokenValue();
+    // Consider wrapping this to catch early bugs
+    const std::string_view fn_name = lexer_->PeekToken().Value;
     lexer_->ConsumeToken();  // Consume function name
 
-    if (!IsNextToken(Token::kLeftParen))
+    if (!IsNextToken(TokenType::kLeftParen))
         return LogErrorP("Expected '(' in prototype");
+    lexer_->ConsumeToken();  // Consume '('
 
     // Read the list of argument names.
     std::vector<std::string_view> args_names;
-    while (IsNextToken(Token::kIdentifier))
-        args_names.push_back(lexer_->PeekTokenValue());
+    while (IsNextToken(TokenType::kIdentifier)) {
+        args_names.push_back(lexer_->PeekToken().Value);
+        lexer_->ConsumeToken();  // Consume identifier
+        // TODO, handle error here
+    }
 
-    if (!IsNextToken(Token::kRightParen))
+    if (!IsNextToken(TokenType::kRightParen))
         return LogErrorP("Expected ')' in prototype");
 
     // success.
@@ -166,11 +174,11 @@ std::unique_ptr<ast::Expression> Parser::ParseExpression()
 ///   ::= parenexpr
 std::unique_ptr<ast::Expression> Parser::ParsePrimaryExpression()
 {
-    if (IsNextToken(Token::kIdentifier))
+    if (IsNextToken(TokenType::kIdentifier))
         return ParseIdentifierExpression();
-    else if (IsNextToken(Token::kNumber))
+    else if (IsNextToken(TokenType::kNumber))
         return ParseNumberExpression();
-    else if (IsNextToken(Token::kLeftParen))
+    else if (IsNextToken(TokenType::kLeftParen))
         return ParseParenthesesExpression();
     else
         return LogError("Unknown token when expecting an expression");
@@ -185,7 +193,7 @@ std::unique_ptr<ast::Expression> Parser::ParseBinaryOpRhs(
     while (true) {
         if (!IsNextTokenBinOp()) return lhs_expression;
 
-        char bin_op = lexer_->PeekTokenValue().front();
+        char bin_op = lexer_->PeekToken().Value.front();
         int curr_token_prec = GetBinOpPrecedence(bin_op);
         // If this is a binop that binds at least as tightly as the current
         // binop, consume it, otherwise we are done.
@@ -200,7 +208,7 @@ std::unique_ptr<ast::Expression> Parser::ParseBinaryOpRhs(
         // If BinOp binds less tightly with RHS than the operator after RHS, let
         // the pending operator take RHS as its LHS.
         if (IsNextTokenBinOp()) {
-            char next_bin_op = lexer_->PeekTokenValue().front();
+            char next_bin_op = lexer_->PeekToken().Value.front();
             if (curr_token_prec < GetBinOpPrecedence(next_bin_op)) {
                 rhs_expression = ParseBinaryOpRhs(expression_precedence + 1,
                                                   std::move(rhs_expression));
@@ -221,7 +229,7 @@ std::unique_ptr<ast::Expression> Parser::ParseParenthesesExpression()
     auto expression = ParseExpression();
     if (!expression) return nullptr;
 
-    if (!IsNextToken(Token::kRightParen)) return LogError("expected ')'");
+    if (!IsNextToken(TokenType::kRightParen)) return LogError("expected ')'");
     lexer_->ConsumeToken();  // eat ')'
     return expression;
 }
@@ -231,25 +239,25 @@ std::unique_ptr<ast::Expression> Parser::ParseParenthesesExpression()
 ///   ::= identifier '(' expression* ')'
 std::unique_ptr<ast::Expression> Parser::ParseIdentifierExpression()
 {
-    std::string_view identifier = lexer_->PeekTokenValue();
+    const std::string_view identifier = lexer_->PeekToken().Value;
     lexer_->ConsumeToken();  // eat identifier
-    if (!IsNextToken(Token::kLeftParen)) {
+    if (!IsNextToken(TokenType::kLeftParen)) {
         return std::make_unique<ast::Variable>(identifier);
     }
 
     // Process fn call
     lexer_->ConsumeToken();  // eat '('
     std::vector<std::unique_ptr<ast::Expression>> fn_args;
-    if (!IsNextToken(Token::kRightParen)) {
+    if (!IsNextToken(TokenType::kRightParen)) {
         while (true) {
             if (auto arg = ParseExpression())
                 fn_args.push_back(std::move(arg));
             else
                 return nullptr;
 
-            if (IsNextToken(Token::kRightParen)) break;
+            if (IsNextToken(TokenType::kRightParen)) break;
 
-            if (!IsNextToken(Token::kComma))
+            if (!IsNextToken(TokenType::kComma))
                 return LogError("Expected ')' or ',' in argument list");
             lexer_->ConsumeToken();
         }
@@ -264,7 +272,7 @@ std::unique_ptr<ast::Expression> Parser::ParseIdentifierExpression()
 /// numberexpr ::= number
 std::unique_ptr<ast::Expression> Parser::ParseNumberExpression()
 {
-    std::string_view value = lexer_->PeekTokenValue();
+    const std::string_view value = lexer_->PeekToken().Value;
     lexer_->ConsumeToken();  // eat number
 
     double num_value;

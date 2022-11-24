@@ -5,24 +5,21 @@
 #include <string_view>
 #include <string>
 
+#include "kaleidoscope/token.h"
+
 namespace kaleidoscope
 {
-
-enum class Token;
 
 class Lexer
 {
    public:
     Lexer() = delete;
     ~Lexer();
-
     explicit Lexer(std::string input);
-
     Lexer(const Lexer& t) = delete;
     Lexer& operator=(const Lexer&) = delete;
 
     Token PeekToken();
-    std::string_view PeekTokenValue();
 
     void ConsumeToken();
 
@@ -32,7 +29,6 @@ class Lexer
 
     bool error_found_ = false;
     std::optional<Token> next_token_ = std::nullopt;
-    std::string_view next_token_value_ = std::string_view(nullptr, 0);
 };
 }  // namespace kaleidoscope
 
