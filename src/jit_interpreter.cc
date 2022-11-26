@@ -1,5 +1,6 @@
 #include "kaleidoscope/jit_interpreter.h"
 
+#include "kaleidoscope/ast/binary_op.h"
 #include "kaleidoscope/ast/expression.h"
 #include "kaleidoscope/ast/number.h"
 
@@ -25,6 +26,24 @@ llvm::Value* JitInterpreter::GenerateIR(const ast::Expression* expression)
     if (const ast::Number* number =
             dynamic_cast<const ast::Number*>(expression)) {
         return llvm::ConstantFP::get(*context_, llvm::APFloat(number->Value));
+    }
+    if (const ast::BinaryOp* bin_op =
+            dynamic_cast<const ast::BinaryOp*>(expression)) {
+        auto lhs = GenerateIR(bin_op->LhsOp.get());
+        auto rhs = GenerateIR(bin_op->RhsOp.get());
+        if (!lhs || !rhs) {
+            return nullptr;
+        }
+        switch (bin_op->Op) {
+            case '+':
+                return ir_builder_->CreateFAdd(lhs, rhs, "addtmp");
+            case '-':
+                return ir_builder_->CreateFSub(lhs, rhs, "subtmp");
+            case '*':
+                return ir_builder_->CreateFMul(lhs, rhs, "multmp");
+            default:
+                return nullptr;
+        }
     }
     return nullptr;
 }
