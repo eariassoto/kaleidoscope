@@ -22,16 +22,7 @@ int main()
             Parser parser(std::make_unique<Lexer>(std::move(input)));
             if (std::unique_ptr<ast::Expression> expr =
                     parser.ParseNextExpression()) {
-                if (ast::Number* number =
-                        dynamic_cast<ast::Number*>(expr.get())) {
-                    interpreter.GenerateIR(*number);
-                    // ugly, fix
-                    std::cout << '\n';
-                    continue;
-                }
-                std::string res;
-                expr->PrintToString(res, 0, '=');
-                std::cout << res;
+                interpreter.EvaluateExpression(expr.get());
             }
         } catch (const LexerError& lexer_err) {
             // TODO: Improve error messages

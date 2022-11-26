@@ -12,7 +12,7 @@ class Expression
 
     virtual void PrintToString(std::string& out_str, size_t indent_level = 0,
                                char space_char = ' ',
-                               size_t indent_size = 2) = 0;
+                               size_t indent_size = 2) const = 0;
 };
 
 }  // namespace kaleidoscope::ast

@@ -17,7 +17,7 @@ struct FnCall : public Expression {
     std::vector<std::unique_ptr<Expression>> Args;
 
     void PrintToString(std::string& out_str, size_t indent_level,
-                       char space_char, size_t indent_size) final;
+                       char space_char, size_t indent_size) const final;
 };
 
 }  // namespace kaleidoscope::ast

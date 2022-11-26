@@ -9,8 +9,9 @@
 namespace kaleidoscope
 {
 
-namespace ast{
-    class Number;
+namespace ast
+{
+class Expression;
 }
 
 class JitInterpreter
@@ -21,14 +22,16 @@ class JitInterpreter
     JitInterpreter& operator=(const JitInterpreter&) = delete;
     ~JitInterpreter();
 
-    void GenerateIR(const ast::Number& expression);
+    void EvaluateExpression(const ast::Expression* expression);
 
-    private:
-    std::unique_ptr<llvm::LLVMContext> context_ = nullptr;
+   private:
+    llvm::Value* GenerateIR(const ast::Expression* expression);
+
+        private : std::unique_ptr<llvm::LLVMContext> context_ = nullptr;
     std::unique_ptr<llvm::Module> module_ = nullptr;
     std::unique_ptr<llvm::IRBuilder<>> ir_builder_ = nullptr;
     std::unordered_map<std::string, llvm::Value*> named_values;
 };
 }  // namespace kaleidoscope
 
-#endif // KALEIDOSCOPE_JIT_INTERPRETER_H
+#endif  // KALEIDOSCOPE_JIT_INTERPRETER_H

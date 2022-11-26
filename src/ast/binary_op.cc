@@ -11,7 +11,7 @@ BinaryOp::BinaryOp(char op, std::unique_ptr<Expression> lhs_op,
 }
 
 void BinaryOp::PrintToString(std::string& out_str, size_t indent_level,
-                             char space_char, size_t indent_size)
+                             char space_char, size_t indent_size) const
 {
     out_str += fmt::format("{: >{}}", "", indent_level * indent_size);
     out_str += fmt::format("bin op={}\n", Op);

@@ -1,5 +1,6 @@
 #include "kaleidoscope/jit_interpreter.h"
 
+#include "kaleidoscope/ast/expression.h"
 #include "kaleidoscope/ast/number.h"
 
 #include <llvm/ADT/APFloat.h>
@@ -18,11 +19,26 @@ JitInterpreter::JitInterpreter()
 {
 }
 
-void JitInterpreter::GenerateIR(const ast::Number& expression)
+llvm::Value* JitInterpreter::GenerateIR(const ast::Expression* expression)
 {
-    llvm::Value* val =
-        llvm::ConstantFP::get(*context_, llvm::APFloat(expression.Value));
-    if (val) val->print(llvm::outs());
+    llvm::Value* val = nullptr;
+    if (const ast::Number* number =
+            dynamic_cast<const ast::Number*>(expression)) {
+        return llvm::ConstantFP::get(*context_, llvm::APFloat(number->Value));
+    }
+    return nullptr;
+}
+
+void JitInterpreter::EvaluateExpression(const ast::Expression* expression)
+{
+    if (llvm::Value* val = GenerateIR(expression)) {
+        val->print(llvm::outs());
+        std::cout << '\n';
+    } else {
+        std::string res;
+        expression->PrintToString(res, 0, '=');
+        std::cout << res;
+    }
 }
 
 JitInterpreter::~JitInterpreter() = default;
