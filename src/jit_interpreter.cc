@@ -2,11 +2,14 @@
 
 #include "kaleidoscope/ast/binary_op.h"
 #include "kaleidoscope/ast/expression.h"
+#include "kaleidoscope/ast/fn_call.h"
 #include "kaleidoscope/ast/number.h"
 
 #include <llvm/ADT/APFloat.h>
 #include <llvm/IR/Constant.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Value.h>
 
 #include <iostream>
 
@@ -45,6 +48,28 @@ llvm::Value* JitInterpreter::GenerateIR(const ast::Expression* expression)
                 return nullptr;
         }
     }
+    if (const ast::FnCall* fn_call =
+            dynamic_cast<const ast::FnCall*>(expression)) {
+        llvm::Function* callee_fn = module_->getFunction(fn_call->Callee);
+        if (!callee_fn) {
+            std::cerr << "Unknown function referenced\n";
+            return nullptr;
+        }
+        // If argument mismatch error.
+        if (callee_fn->arg_size() != fn_call->Args.size()) {
+            std::cerr << "Incorrect # arguments passed\n";
+            return nullptr;
+        }
+        std::vector<llvm::Value*> args_ir;
+        for (const auto& arg: fn_call->Args) {
+            llvm::Value* arg_ir = GenerateIR(arg.get());
+            if(!arg_ir) return nullptr;
+            args_ir.push_back(arg_ir);
+        }
+
+        return ir_builder_->CreateCall(callee_fn, args_ir, "calltmp");
+    }
+
     return nullptr;
 }
 
