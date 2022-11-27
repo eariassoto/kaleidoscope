@@ -48,7 +48,7 @@ Lexer::~Lexer() = default;
 
 tl::expected<Token, LexerError> Lexer::PeekToken()
 {
-    if (next_token_.has_value()) next_token_.value();
+    if (next_token_.has_value()) return next_token_.value();
 
     // Trim the input
     auto trim_it =
