@@ -12,17 +12,18 @@ using namespace std::literals::string_view_literals;
 
 namespace
 {
-void TokensInLexerMatch(
-    Lexer *lexer,
-    const std::vector<std::pair<TokenType, std::string_view>> &expected_tokens)
+void TokensInLexerMatch(const char *actual_input,
+                        const std::vector<Token> &expected_tokens)
 {
+    std::string input_str(actual_input);
+    Lexer lexer(std::move(input_str));
     for (size_t i = 0; i < expected_tokens.size(); ++i) {
         const auto &[type, value] = expected_tokens.at(i);
-        EXPECT_EQ(type, lexer->PeekToken().Type) << "i= " << i;
-        EXPECT_EQ(value, lexer->PeekToken().Value);
-        lexer->ConsumeToken();
+        EXPECT_EQ(type, lexer.PeekToken().Type) << "i= " << i;
+        EXPECT_EQ(value, lexer.PeekToken().Value);
+        lexer.ConsumeToken();
     }
-    EXPECT_EQ(TokenType::kEof, lexer->PeekToken().Type);
+    EXPECT_EQ(TokenType::kEof, lexer.PeekToken().Type);
 }
 }  // namespace
 
@@ -33,15 +34,13 @@ class LexerTest : public ::testing::Test
 TEST_F(LexerTest, EmptyInput)
 {
     {
-        Lexer lexer(std::string(""));
-        TokensInLexerMatch(&lexer, {});
+        TokensInLexerMatch("", {});
     }
     {
         const char *input =
             "    "
             "    ";
-        Lexer lexer(std::move(std::string(input)));
-        TokensInLexerMatch(&lexer, {});
+        TokensInLexerMatch(input, {});
     }
 }
 
@@ -49,46 +48,44 @@ TEST_F(LexerTest, ParseReservedWordTokens)
 {
     {
         const char *input = "def defdef    \r\n  \ndef";
-        Lexer lexer(std::move(std::string(input)));
-        TokensInLexerMatch(&lexer, {{TokenType::kDef, "def"sv},
-                                    {TokenType::kIdentifier, "defdef"sv},
-                                    {TokenType::kDef, "def"sv}});
+        TokensInLexerMatch(input, {{TokenType::kDef, "def"sv},
+                                   {TokenType::kIdentifier, "defdef"sv},
+                                   {TokenType::kDef, "def"sv}});
     }
     {
         const char *input = "exte rn extern   extern";
-        Lexer lexer(std::move(std::string(input)));
-        TokensInLexerMatch(&lexer, {{TokenType::kIdentifier, "exte"sv},
-                                    {TokenType::kIdentifier, "rn"sv},
-                                    {TokenType::kExtern, "extern"sv},
-                                    {TokenType::kExtern, "extern"sv}});
+        TokensInLexerMatch(input, {{TokenType::kIdentifier, "exte"sv},
+                                   {TokenType::kIdentifier, "rn"sv},
+                                   {TokenType::kExtern, "extern"sv},
+                                   {TokenType::kExtern, "extern"sv}});
     }
 }
 
 TEST_F(LexerTest, ParseIdentifierTokens)
 {
-    Lexer lexer(std::string("   \r\nid1 Abc78TTTT"));
-    TokensInLexerMatch(&lexer, {{TokenType::kIdentifier, "id1"sv},
-                                {TokenType::kIdentifier, "Abc78TTTT"sv}});
+    const char *input = "   \r\nid1 Abc78TTTT";
+    TokensInLexerMatch(input, {{TokenType::kIdentifier, "id1"sv},
+                               {TokenType::kIdentifier, "Abc78TTTT"sv}});
 }
 
 TEST_F(LexerTest, ParseNumberTokens)
 {
-    Lexer lexer(std::string("   \n\n\r\n1    \r\n888734743  42"));
-    TokensInLexerMatch(&lexer, {{TokenType::kNumber, "1"sv},
-                                {TokenType::kNumber, "888734743"sv},
-                                {TokenType::kNumber, "42"sv}});
+    const char *input = "   \n\n\r\n1    \r\n888734743  42";
+    TokensInLexerMatch(input, {{TokenType::kNumber, "1"sv},
+                               {TokenType::kNumber, "888734743"sv},
+                               {TokenType::kNumber, "42"sv}});
 }
 
 TEST_F(LexerTest, ParseCharTokens)
 {
-    Lexer lexer(std::string("   ( ) - + * , .   "));
-    TokensInLexerMatch(&lexer, {{TokenType::kLeftParen, "("sv},
-                                {TokenType::kRightParen, ")"sv},
-                                {TokenType::kMinusSign, "-"sv},
-                                {TokenType::kPlusSign, "+"sv},
-                                {TokenType::kAsterisk, "*"sv},
-                                {TokenType::kComma, ","sv},
-                                {TokenType::kDot, "."sv}});
+    const char *input = "   ( ) - + * , .   ";
+    TokensInLexerMatch(input, {{TokenType::kLeftParen, "("sv},
+                               {TokenType::kRightParen, ")"sv},
+                               {TokenType::kMinusSign, "-"sv},
+                               {TokenType::kPlusSign, "+"sv},
+                               {TokenType::kAsterisk, "*"sv},
+                               {TokenType::kComma, ","sv},
+                               {TokenType::kDot, "."sv}});
 }
 
 int main(int argc, char **argv)
