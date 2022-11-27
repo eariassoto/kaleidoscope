@@ -69,22 +69,6 @@ Token Lexer::PeekToken()
     input_to_process_ =
         input_to_process_.substr(trim_it - input_to_process_.begin());
 
-    //  Check for reserved words
-    if (input_to_process_.substr(0, kDefKeyword.size()) == kDefKeyword) {
-        next_token_.emplace(
-            TokenType::kDef,
-            std::string_view(input_to_process_.data(), kDefKeyword.size()));
-        input_to_process_ = input_to_process_.substr(kDefKeyword.size());
-        return next_token_.value();
-    }
-    if (input_to_process_.substr(0, kExternKeyword.size()) == kExternKeyword) {
-        next_token_.emplace(
-            TokenType::kExtern,
-            std::string_view(input_to_process_.data(), kExternKeyword.size()));
-        input_to_process_ = input_to_process_.substr(kExternKeyword.size());
-        return next_token_.value();
-    }
-
     const unsigned char next_char =
         static_cast<unsigned char>(input_to_process_.front());
     if (std::isalpha(next_char)) {
@@ -92,16 +76,20 @@ Token Lexer::PeekToken()
         auto identifier_it =
             std::find_if(input_to_process_.begin(), input_to_process_.end(),
                          [](unsigned char ch) { return !std::isalnum(ch); });
-
-        const size_t value_size = identifier_it - input_to_process_.begin();
-        next_token_.emplace(
-            TokenType::kIdentifier,
-            std::string_view(input_to_process_.data(), value_size));
+        const std::string_view next_alpha_num = input_to_process_.substr(
+            0, identifier_it - input_to_process_.begin());
+        TokenType token_found = TokenType::kIdentifier;
+        //  Check for reserved words
+        if (next_alpha_num == kDefKeyword) {
+            token_found = TokenType::kDef;
+        } else if (next_alpha_num == kExternKeyword) {
+            token_found = TokenType::kExtern;
+        }
 
         // Consume the identifier
-        input_to_process_ = input_to_process_.substr(value_size);
+        input_to_process_ = input_to_process_.substr(next_alpha_num.size());
 
-        return next_token_.value();
+        return next_token_.emplace(token_found, next_alpha_num);
     }
 
     if (std::isdigit(next_char)) {
@@ -109,16 +97,12 @@ Token Lexer::PeekToken()
         auto num_it =
             std::find_if(input_to_process_.begin(), input_to_process_.end(),
                          [](unsigned char ch) { return !std::isdigit(ch); });
-
-        const size_t value_size = num_it - input_to_process_.begin();
-        next_token_.emplace(
-            TokenType::kNumber,
-            std::string_view(input_to_process_.data(), value_size));
+        const std::string_view next_digit =
+            input_to_process_.substr(0, num_it - input_to_process_.begin());
 
         // Consume the identifier
-        input_to_process_ = input_to_process_.substr(value_size);
-
-        return next_token_.value();
+        input_to_process_ = input_to_process_.substr(next_digit.size());
+        return next_token_.emplace(TokenType::kNumber, next_digit);
     }
 
     // Check if the next token is a valid character

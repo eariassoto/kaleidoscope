@@ -48,21 +48,17 @@ TEST_F(LexerTest, EmptyInput)
 TEST_F(LexerTest, ParseReservedWordTokens)
 {
     {
-        const char *input =
-            "def def   def"
-            "def";
+        const char *input = "def defdef    \r\n  \ndef";
         Lexer lexer(std::move(std::string(input)));
         TokensInLexerMatch(&lexer, {{TokenType::kDef, "def"sv},
-                                    {TokenType::kDef, "def"sv},
-                                    {TokenType::kDef, "def"sv},
+                                    {TokenType::kIdentifier, "defdef"sv},
                                     {TokenType::kDef, "def"sv}});
     }
     {
-        const char *input =
-            "extern extern   "
-            "extern";
+        const char *input = "exte rn extern   extern";
         Lexer lexer(std::move(std::string(input)));
-        TokensInLexerMatch(&lexer, {{TokenType::kExtern, "extern"sv},
+        TokensInLexerMatch(&lexer, {{TokenType::kIdentifier, "exte"sv},
+                                    {TokenType::kIdentifier, "rn"sv},
                                     {TokenType::kExtern, "extern"sv},
                                     {TokenType::kExtern, "extern"sv}});
     }
