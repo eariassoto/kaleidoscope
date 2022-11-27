@@ -31,37 +31,26 @@ std::unique_ptr<ast::FnPrototype> LogErrorP(const std::string& err_str)
     return nullptr;
 }
 
-int GetBinOpPrecedence(char value)
+int GetBinOpPrecedence(const Token& token)
 {
     // if (value == '<') return 10;
-    if (value == '+') return 20;
-    if (value == '-') return 20;
-    if (value == '*') return 40;
+    if (token.Type == TokenType::kPlusSign) return 20;
+    if (token.Type == TokenType::kMinusSign) return 20;
+    if (token.Type == TokenType::kAsterisk) return 40;
     throw std::invalid_argument("Not found");
+}
+
+bool IsNextTokenBinOp(const Token& token)
+{
+    return token.Type == TokenType::kPlusSign ||
+           token.Type == TokenType::kMinusSign ||
+           token.Type == TokenType::kAsterisk;
 }
 }  // namespace
 
 Parser::Parser(std::unique_ptr<Lexer> lexer) : lexer_(std::move(lexer)) {}
 
 Parser::~Parser() = default;
-
-bool Parser::IsNextToken(TokenType type)
-{
-    try {
-        const Token t = lexer_->PeekToken();
-        std::cout << "IsNextToken " << TokenTypeToString(t.Type) << '\n';
-        return t.Type == type;
-    } catch (const LexerError& err) {
-        return false;
-    }
-}
-
-bool Parser::IsNextTokenBinOp()
-{
-    return IsNextToken(TokenType::kPlusSign) ||
-           IsNextToken(TokenType::kMinusSign) ||
-           IsNextToken(TokenType::kAsterisk);
-}
 
 /// toplevelexpr ::= expression
 std::unique_ptr<ast::Fn> Parser::ParseNextTopLevelExpression()
@@ -81,16 +70,22 @@ std::unique_ptr<ast::Fn> Parser::ParseNextTopLevelExpression()
 /// top ::= definition | external | expression
 std::unique_ptr<ast::Expression> Parser::ParseNextExpression()
 {
-    if (IsNextToken(TokenType::kEof)) {
+    const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
         return nullptr;
-    } else if (IsNextToken(TokenType::kDef)) {
+    }
+    const Token& token = peek_token.value();
+    if (token.Type == TokenType::kEof) {
+        return nullptr;
+    } else if (token.Type == TokenType::kDef) {
         if (auto def = ParseDefinition()) {
             return def;
         }
         // Skip token for error recovery.
         lexer_->ConsumeToken();
         return nullptr;
-    } else if (IsNextToken(TokenType::kExtern)) {
+    } else if (token.Type == TokenType::kExtern) {
         if (auto ext = ParseExtern()) {
             return ext;
         }
@@ -129,26 +124,43 @@ std::unique_ptr<ast::FnPrototype> Parser::ParseExtern()
 ///   ::= id '(' id* ')'
 std::unique_ptr<ast::FnPrototype> Parser::ParsePrototype()
 {
-    if (!IsNextToken(TokenType::kIdentifier))
+    const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
+    if (peek_token->Type != TokenType::kIdentifier)
         return LogErrorP("Expected function name in prototype");
 
     // Consider wrapping this to catch early bugs
-    const std::string_view fn_name = lexer_->PeekToken().Value;
+    const std::string_view fn_name = peek_token->Value;
     lexer_->ConsumeToken();  // Consume function name
 
-    if (!IsNextToken(TokenType::kLeftParen))
+    if (peek_token->Type != TokenType::kLeftParen)
         return LogErrorP("Expected '(' in prototype");
+
     lexer_->ConsumeToken();  // Consume '('
 
     // Read the list of argument names.
     std::vector<std::string_view> args_names;
-    while (IsNextToken(TokenType::kIdentifier)) {
-        args_names.push_back(lexer_->PeekToken().Value);
-        lexer_->ConsumeToken();  // Consume identifier
-        // TODO, handle error here
+    // TODO: Parse this as comma separated identifiers
+    while (true) {
+        if (const tl::expected<Token, LexerError> arg_token =
+                lexer_->PeekToken()) {
+            if (arg_token->Type == TokenType::kIdentifier) {
+                args_names.push_back(arg_token->Value);
+                lexer_->ConsumeToken();  // Consume identifier
+            } else {
+                break;
+            }
+
+        } else {
+            // TODO: handle error
+            return nullptr;
+        }
     }
 
-    if (!IsNextToken(TokenType::kRightParen))
+    if (peek_token->Type != TokenType::kRightParen)
         return LogErrorP("Expected ')' in prototype");
 
     // success.
@@ -174,11 +186,16 @@ std::unique_ptr<ast::Expression> Parser::ParseExpression()
 ///   ::= parenexpr
 std::unique_ptr<ast::Expression> Parser::ParsePrimaryExpression()
 {
-    if (IsNextToken(TokenType::kIdentifier))
+    const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
+    if (peek_token->Type == TokenType::kIdentifier)
         return ParseIdentifierExpression();
-    else if (IsNextToken(TokenType::kNumber))
+    else if (peek_token->Type == TokenType::kNumber)
         return ParseNumberExpression();
-    else if (IsNextToken(TokenType::kLeftParen))
+    else if (peek_token->Type == TokenType::kLeftParen)
         return ParseParenthesesExpression();
     else
         return LogError("Unknown token when expecting an expression");
@@ -191,10 +208,14 @@ std::unique_ptr<ast::Expression> Parser::ParseBinaryOpRhs(
 {
     // If this is a binop, find its precedence.
     while (true) {
-        if (!IsNextTokenBinOp()) return lhs_expression;
-
-        char bin_op = lexer_->PeekToken().Value.front();
-        int curr_token_prec = GetBinOpPrecedence(bin_op);
+        const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+        if (!peek_token) {
+            // TODO: Handle error
+            return nullptr;
+        }
+        if (!IsNextTokenBinOp(*peek_token)) return lhs_expression;
+        char bin_op = peek_token->Value.front();
+        int curr_token_prec = GetBinOpPrecedence(*peek_token);
         // If this is a binop that binds at least as tightly as the current
         // binop, consume it, otherwise we are done.
         if (curr_token_prec < expression_precedence) return lhs_expression;
@@ -207,9 +228,14 @@ std::unique_ptr<ast::Expression> Parser::ParseBinaryOpRhs(
 
         // If BinOp binds less tightly with RHS than the operator after RHS, let
         // the pending operator take RHS as its LHS.
-        if (IsNextTokenBinOp()) {
-            char next_bin_op = lexer_->PeekToken().Value.front();
-            if (curr_token_prec < GetBinOpPrecedence(next_bin_op)) {
+        const tl::expected<Token, LexerError> next_peek_token =
+            lexer_->PeekToken();
+        if (!next_peek_token) {
+            // TODO: Handle error
+            return nullptr;
+        }
+        if (IsNextTokenBinOp(*next_peek_token)) {
+            if (curr_token_prec < GetBinOpPrecedence(*next_peek_token)) {
                 rhs_expression = ParseBinaryOpRhs(expression_precedence + 1,
                                                   std::move(rhs_expression));
                 if (!rhs_expression) return nullptr;
@@ -229,7 +255,13 @@ std::unique_ptr<ast::Expression> Parser::ParseParenthesesExpression()
     auto expression = ParseExpression();
     if (!expression) return nullptr;
 
-    if (!IsNextToken(TokenType::kRightParen)) return LogError("expected ')'");
+    const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
+    if (peek_token->Type != TokenType::kRightParen)
+        return LogError("expected ')'");
     lexer_->ConsumeToken();  // eat ')'
     return expression;
 }
@@ -239,25 +271,42 @@ std::unique_ptr<ast::Expression> Parser::ParseParenthesesExpression()
 ///   ::= identifier '(' expression* ')'
 std::unique_ptr<ast::Expression> Parser::ParseIdentifierExpression()
 {
-    const std::string_view identifier = lexer_->PeekToken().Value;
+    const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
+    const std::string_view identifier = peek_token->Value;
     lexer_->ConsumeToken();  // eat identifier
-    if (!IsNextToken(TokenType::kLeftParen)) {
+    if (peek_token->Type != TokenType::kLeftParen) {
         return std::make_unique<ast::Variable>(identifier);
     }
 
     // Process fn call
     lexer_->ConsumeToken();  // eat '('
     std::vector<std::unique_ptr<ast::Expression>> fn_args;
-    if (!IsNextToken(TokenType::kRightParen)) {
+
+    tl::expected<Token, LexerError> arg_token = lexer_->PeekToken();
+    if (!arg_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
+    if (peek_token->Type != TokenType::kRightParen) {
         while (true) {
             if (auto arg = ParseExpression())
                 fn_args.push_back(std::move(arg));
             else
                 return nullptr;
 
-            if (IsNextToken(TokenType::kRightParen)) break;
+            arg_token = lexer_->PeekToken();
+            if (!arg_token) {
+                // TODO: Handle error
+                return nullptr;
+            }
 
-            if (!IsNextToken(TokenType::kComma))
+            if (peek_token->Type == TokenType::kRightParen) break;
+
+            if (peek_token->Type != TokenType::kComma)
                 return LogError("Expected ')' or ',' in argument list");
             lexer_->ConsumeToken();
         }
@@ -272,7 +321,12 @@ std::unique_ptr<ast::Expression> Parser::ParseIdentifierExpression()
 /// numberexpr ::= number
 std::unique_ptr<ast::Expression> Parser::ParseNumberExpression()
 {
-    const std::string_view value = lexer_->PeekToken().Value;
+    const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
+    const std::string_view value = peek_token->Value;
     lexer_->ConsumeToken();  // eat number
 
     double num_value;

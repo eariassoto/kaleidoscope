@@ -9,8 +9,11 @@ This project requires:
 * A C++17 compatible compiler.
 * CMake 3.12+.
 * The LLVM libraries (I am using version 14.0.0).
-* GTest (fetched by CMake).
-* fmtlib (fetched by CMake).
+
+Dependencies fetched by CMake:
+* GTest
+* [fmtlib](https://github.com/fmtlib/fmt)
+* [tl::expected](https://github.com/TartanLlama/expected) (Sy Brand's `std::expected` implementation for C++11/14/17)
 
 Build as any other CMake project. I recommend https://cliutils.gitlab.io/modern-cmake/ as a good reference to work with CMake projects. Generally, this should be enough to build the project:
 

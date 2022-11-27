@@ -14,9 +14,6 @@ class LexerError : public std::exception
 
     explicit LexerError(char input);
 
-    LexerError(const LexerError& t) = delete;
-    LexerError& operator=(const LexerError&) = delete;
-
     const char* what() const noexcept override;
 
    private:

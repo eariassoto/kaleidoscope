@@ -34,7 +34,7 @@ target_include_directories(kaleidoscope PUBLIC ../include)
 
 target_compile_features(kaleidoscope PUBLIC cxx_std_17)
 
-target_link_libraries(kaleidoscope PUBLIC fmt)
+target_link_libraries(kaleidoscope PUBLIC fmt expected)
 
 llvm_map_components_to_libnames(llvm_libs core)
 target_link_libraries(kaleidoscope PRIVATE ${llvm_libs})

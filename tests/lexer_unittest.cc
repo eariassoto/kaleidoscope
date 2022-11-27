@@ -17,13 +17,16 @@ void TokensInLexerMatch(const char *actual_input,
 {
     std::string input_str(actual_input);
     Lexer lexer(std::move(input_str));
-    for (size_t i = 0; i < expected_tokens.size(); ++i) {
-        const auto &[type, value] = expected_tokens.at(i);
-        EXPECT_EQ(type, lexer.PeekToken().Type) << "i= " << i;
-        EXPECT_EQ(value, lexer.PeekToken().Value);
+    for (const Token &expected_token : expected_tokens) {
+        const tl::expected<Token, LexerError> actual_token = lexer.PeekToken();
+        ASSERT_TRUE(actual_token);
+        EXPECT_EQ(expected_token.Type, actual_token->Type);
+        EXPECT_EQ(expected_token.Value, actual_token->Value);
         lexer.ConsumeToken();
     }
-    EXPECT_EQ(TokenType::kEof, lexer.PeekToken().Type);
+    const tl::expected<Token, LexerError> eof_token = lexer.PeekToken();
+    ASSERT_TRUE(eof_token);
+    EXPECT_EQ(TokenType::kEof, eof_token->Type);
 }
 }  // namespace
 

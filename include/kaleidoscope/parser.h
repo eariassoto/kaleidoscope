@@ -29,9 +29,6 @@ class Parser
     std::unique_ptr<Lexer> lexer_;
 
    private:
-    bool IsNextToken(TokenType type);
-    bool IsNextTokenBinOp();
-
     std::unique_ptr<ast::Fn> ParseDefinition();
     std::unique_ptr<ast::FnPrototype> ParseExtern();
     std::unique_ptr<ast::FnPrototype> ParsePrototype();

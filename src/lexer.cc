@@ -46,24 +46,17 @@ Lexer::Lexer(std::string input)
 
 Lexer::~Lexer() = default;
 
-Token Lexer::PeekToken()
+tl::expected<Token, LexerError> Lexer::PeekToken()
 {
-    if (error_found_) throw LexerError(input_to_process_.front());
+    if (next_token_.has_value()) next_token_.value();
 
-    if (next_token_) return next_token_.value();
-
-    if (input_to_process_.empty()) {
-        next_token_.emplace(TokenType::kEof, std::string_view());
-        return next_token_.value();
-    }
     // Trim the input
     auto trim_it =
         std::find_if(input_to_process_.begin(), input_to_process_.end(),
                      [](unsigned char ch) { return !std::isspace(ch); });
 
     if (trim_it == input_to_process_.end()) {
-        next_token_.emplace(TokenType::kEof, std::string_view());
-        return next_token_.value();
+        return next_token_.emplace(Token(TokenType::kEof, std::string_view()));
     }
     // Advance the string view to ignore whitespaces
     input_to_process_ =
@@ -89,7 +82,7 @@ Token Lexer::PeekToken()
         // Consume the identifier
         input_to_process_ = input_to_process_.substr(next_alpha_num.size());
 
-        return next_token_.emplace(token_found, next_alpha_num);
+        return next_token_.emplace(Token(token_found, next_alpha_num));
     }
 
     if (std::isdigit(next_char)) {
@@ -102,7 +95,7 @@ Token Lexer::PeekToken()
 
         // Consume the identifier
         input_to_process_ = input_to_process_.substr(next_digit.size());
-        return next_token_.emplace(TokenType::kNumber, next_digit);
+        return next_token_.emplace(Token(TokenType::kNumber, next_digit));
     }
 
     // Check if the next token is a valid character
@@ -110,26 +103,25 @@ Token Lexer::PeekToken()
             kAllowedCharacters.begin(), kAllowedCharacters.end(),
             [&next_char](const auto& p) { return p.first == next_char; });
         it != kAllowedCharacters.end()) {
-        next_token_.emplace((*it).second,
-                            std::string_view(input_to_process_.data(), 1));
+        next_token_.emplace(Token((*it).second, input_to_process_.substr(0, 1)));
 
         input_to_process_ = input_to_process_.substr(1);
 
         return next_token_.value();
     }
 
-    // Invalid character, throw error
-    error_found_ = true;
-    throw LexerError(next_char);
+    // Invalid character, return error
+    return next_token_.emplace(tl::unexpected<LexerError>(next_char));
 }
 
 void Lexer::ConsumeToken()
 {
     // If token has not been peeked, do it and continue
-    if (!next_token_) PeekToken();
+    if (!next_token_.has_value()) PeekToken();
 
-    // Do not advance if EOF has been reached
-    if (next_token_->Type == TokenType::kEof) return;
+    // Do not advance if EOF has been reached, or an error has been found
+    const tl::expected<Token, LexerError>& token = next_token_.value();
+    if (!token.has_value() || token->Type == TokenType::kEof) return;
 
     next_token_.reset();
 }

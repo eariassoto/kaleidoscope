@@ -26,6 +26,14 @@ FetchContent_Declare(
   GIT_TAG 9.0.0)
 FetchContent_MakeAvailable(fmtlib)
 
+# tl::expected
+set(EXPECTED_BUILD_TESTS, OFF)
+FetchContent_Declare(
+  expected
+  GIT_REPOSITORY https://github.com/TartanLlama/expected.git
+  GIT_TAG b74fecd4448a1a5549402d17ddc51e39faa5020c)
+FetchContent_MakeAvailable(expected)
+
 # Configure LLVM
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
