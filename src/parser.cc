@@ -124,7 +124,7 @@ std::unique_ptr<ast::FnPrototype> Parser::ParseExtern()
 ///   ::= id '(' id* ')'
 std::unique_ptr<ast::FnPrototype> Parser::ParsePrototype()
 {
-    const tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
+    tl::expected<Token, LexerError> peek_token = lexer_->PeekToken();
     if (!peek_token) {
         // TODO: Handle error
         return nullptr;
@@ -136,6 +136,11 @@ std::unique_ptr<ast::FnPrototype> Parser::ParsePrototype()
     const std::string_view fn_name = peek_token->Value;
     lexer_->ConsumeToken();  // Consume function name
 
+    peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
     if (peek_token->Type != TokenType::kLeftParen)
         return LogErrorP("Expected '(' in prototype");
 
@@ -160,6 +165,11 @@ std::unique_ptr<ast::FnPrototype> Parser::ParsePrototype()
         }
     }
 
+    peek_token = lexer_->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
     if (peek_token->Type != TokenType::kRightParen)
         return LogErrorP("Expected ')' in prototype");
 
