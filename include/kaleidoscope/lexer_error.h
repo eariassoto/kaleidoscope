@@ -20,4 +20,4 @@ class LexerError
 };
 }  // namespace kaleidoscope
 
-#endif // #define KALEIDOSCOPE_LEXER_ERROR_H
+#endif  // #define KALEIDOSCOPE_LEXER_ERROR_H

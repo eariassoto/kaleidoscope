@@ -103,7 +103,8 @@ tl::expected<Token, LexerError> Lexer::PeekToken()
             kAllowedCharacters.begin(), kAllowedCharacters.end(),
             [&next_char](const auto& p) { return p.first == next_char; });
         it != kAllowedCharacters.end()) {
-        next_token_.emplace(Token((*it).second, input_to_process_.substr(0, 1)));
+        next_token_.emplace(
+            Token((*it).second, input_to_process_.substr(0, 1)));
 
         input_to_process_ = input_to_process_.substr(1);
 

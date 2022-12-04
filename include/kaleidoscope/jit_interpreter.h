@@ -11,7 +11,7 @@ namespace kaleidoscope
 
 namespace ast
 {
-class Expression;
+class BaseExpression;
 }
 
 class JitInterpreter
@@ -22,12 +22,13 @@ class JitInterpreter
     JitInterpreter& operator=(const JitInterpreter&) = delete;
     ~JitInterpreter();
 
-    void EvaluateExpression(const ast::Expression* expression);
+    void EvaluateExpression(const ast::BaseExpression* expression);
 
    private:
-    llvm::Value* GenerateIR(const ast::Expression* expression);
+    llvm::Value* GenerateIR(const ast::BaseExpression* expression);
 
-        private : std::unique_ptr<llvm::LLVMContext> context_ = nullptr;
+   private:
+    std::unique_ptr<llvm::LLVMContext> context_ = nullptr;
     std::unique_ptr<llvm::Module> module_ = nullptr;
     std::unique_ptr<llvm::IRBuilder<>> ir_builder_ = nullptr;
     std::unordered_map<std::string, llvm::Value*> named_values;

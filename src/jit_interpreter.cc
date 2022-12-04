@@ -1,7 +1,7 @@
 #include "kaleidoscope/jit_interpreter.h"
 
+#include "kaleidoscope/ast/base_expression.h"
 #include "kaleidoscope/ast/binary_op.h"
-#include "kaleidoscope/ast/expression.h"
 #include "kaleidoscope/ast/fn_call.h"
 #include "kaleidoscope/ast/number.h"
 
@@ -23,7 +23,7 @@ JitInterpreter::JitInterpreter()
 {
 }
 
-llvm::Value* JitInterpreter::GenerateIR(const ast::Expression* expression)
+llvm::Value* JitInterpreter::GenerateIR(const ast::BaseExpression* expression)
 {
     llvm::Value* val = nullptr;
     if (const ast::Number* number =
@@ -61,9 +61,9 @@ llvm::Value* JitInterpreter::GenerateIR(const ast::Expression* expression)
             return nullptr;
         }
         std::vector<llvm::Value*> args_ir;
-        for (const auto& arg: fn_call->Args) {
+        for (const auto& arg : fn_call->Args) {
             llvm::Value* arg_ir = GenerateIR(arg.get());
-            if(!arg_ir) return nullptr;
+            if (!arg_ir) return nullptr;
             args_ir.push_back(arg_ir);
         }
 
@@ -73,7 +73,7 @@ llvm::Value* JitInterpreter::GenerateIR(const ast::Expression* expression)
     return nullptr;
 }
 
-void JitInterpreter::EvaluateExpression(const ast::Expression* expression)
+void JitInterpreter::EvaluateExpression(const ast::BaseExpression* expression)
 {
     if (llvm::Value* val = GenerateIR(expression)) {
         val->print(llvm::outs());

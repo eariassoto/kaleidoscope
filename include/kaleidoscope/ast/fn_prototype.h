@@ -1,7 +1,7 @@
 #ifndef KALEIDOSCOPE_AST_FN_PROTOTYPE_H
 #define KALEIDOSCOPE_AST_FN_PROTOTYPE_H
 
-#include "kaleidoscope/ast/expression.h"
+#include "kaleidoscope/ast/base_expression.h"
 
 #include <memory>
 #include <string_view>
@@ -9,7 +9,7 @@
 
 namespace kaleidoscope::ast
 {
-struct FnPrototype : public Expression {
+struct FnPrototype : public BaseExpression {
     FnPrototype(const std::string_view& name,
                 std::vector<std::string_view> args);
 

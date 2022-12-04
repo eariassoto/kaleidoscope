@@ -7,7 +7,7 @@ namespace kaleidoscope::ast
 Variable::Variable(std::string_view name) : Name(name) {}
 
 void Variable::PrintToString(std::string& out_str, size_t indent_level,
-                           char space_char, size_t indent_size) const
+                             char space_char, size_t indent_size) const
 {
     out_str += fmt::format("{: >{}}", "", indent_level * indent_size);
     out_str += fmt::format("var={}\n", Name);

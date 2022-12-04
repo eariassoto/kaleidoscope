@@ -1,7 +1,7 @@
 # Copyright 2022 Emmanuel Arias Soto
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/base_expression.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/binary_op.h"
-  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/expression.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/fn_call.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/fn_prototype.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/fn.h"

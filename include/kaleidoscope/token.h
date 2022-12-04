@@ -28,26 +28,37 @@ enum class TokenType {
 
 constexpr const char* TokenTypeToString(TokenType t) noexcept
 {
-    switch (t)
-    {
-    case TokenType::kEof: return "EOF";
+    switch (t) {
+        case TokenType::kEof:
+            return "EOF";
 
-    // reserved words
-    case TokenType::kDef: return "DEF";
-    case TokenType::kExtern: return "EXTERN";
+        // reserved words
+        case TokenType::kDef:
+            return "DEF";
+        case TokenType::kExtern:
+            return "EXTERN";
 
-    // variable values
-    case TokenType::kIdentifier: return "ID";
-    case TokenType::kNumber: return "NUMBER";
+        // variable values
+        case TokenType::kIdentifier:
+            return "ID";
+        case TokenType::kNumber:
+            return "NUMBER";
 
-    // characters
-    case TokenType::kLeftParen: return "LEFT_PAREN";
-    case TokenType::kRightParen: return "RIGHT_PAREN";
-    case TokenType::kPlusSign: return "PLUS";
-    case TokenType::kMinusSign: return "MINUS";
-    case TokenType::kAsterisk: return "ASTERISK";
-    case TokenType::kComma: return "COMMA";
-    case TokenType::kDot: return "DOT";
+        // characters
+        case TokenType::kLeftParen:
+            return "LEFT_PAREN";
+        case TokenType::kRightParen:
+            return "RIGHT_PAREN";
+        case TokenType::kPlusSign:
+            return "PLUS";
+        case TokenType::kMinusSign:
+            return "MINUS";
+        case TokenType::kAsterisk:
+            return "ASTERISK";
+        case TokenType::kComma:
+            return "COMMA";
+        case TokenType::kDot:
+            return "DOT";
     }
 }
 

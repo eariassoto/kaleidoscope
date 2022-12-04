@@ -1,13 +1,13 @@
 #ifndef KALEIDOSCOPE_AST_VARIABLE_H
 #define KALEIDOSCOPE_AST_VARIABLE_H
 
-#include "kaleidoscope/ast/expression.h"
+#include "kaleidoscope/ast/base_expression.h"
 
 #include <string_view>
 
 namespace kaleidoscope::ast
 {
-struct Variable : public Expression {
+struct Variable : public BaseExpression {
     Variable(std::string_view name);
 
     std::string_view Name;

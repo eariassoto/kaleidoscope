@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-using kaleidoscope::ast::Expression;
+using kaleidoscope::ast::BaseExpression;
 using kaleidoscope::JitInterpreter;
 using kaleidoscope::Lexer;
 using kaleidoscope::LexerError;
@@ -23,7 +23,7 @@ int main()
         if (input.empty()) continue;
 
         Lexer lex(std::move(input));
-        if (std::unique_ptr<Expression> expr = ParseNextExpression(&lex)) {
+        if (std::unique_ptr<BaseExpression> expr = ParseNextExpression(&lex)) {
             interpreter.EvaluateExpression(expr.get());
         }
     }

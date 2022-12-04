@@ -4,7 +4,7 @@
 
 namespace kaleidoscope::ast
 {
-Fn::Fn(std::unique_ptr<FnPrototype> proto, std::unique_ptr<Expression> body)
+Fn::Fn(std::unique_ptr<FnPrototype> proto, std::unique_ptr<BaseExpression> body)
     : Proto(std::move(proto)), Body(std::move(body))
 {
 }

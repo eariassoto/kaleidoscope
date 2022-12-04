@@ -5,7 +5,7 @@
 namespace kaleidoscope::ast
 {
 FnCall::FnCall(const std::string_view& callee,
-               std::vector<std::unique_ptr<Expression>> args)
+               std::vector<std::unique_ptr<BaseExpression>> args)
     : Callee(callee), Args(std::move(args))
 {
 }

@@ -5,10 +5,10 @@
 
 namespace kaleidoscope::ast
 {
-class Expression
+class BaseExpression
 {
    public:
-    virtual ~Expression() = default;
+    virtual ~BaseExpression() = default;
 
     virtual void PrintToString(std::string& out_str, size_t indent_level = 0,
                                char space_char = ' ',

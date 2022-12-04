@@ -24,20 +24,20 @@ std::unique_ptr<ast::Fn> ParseNextTopLevelExpression(Lexer* lexer);
 std::unique_ptr<ast::Fn> ParseDefinition(Lexer* lexer);
 std::unique_ptr<ast::FnPrototype> ParseExtern(Lexer* lexer);
 std::unique_ptr<ast::FnPrototype> ParsePrototype(Lexer* lexer);
-std::unique_ptr<ast::Expression> ParseExpression(Lexer* lexer);
-std::unique_ptr<ast::Expression> ParsePrimaryExpression(Lexer* lexer);
-std::unique_ptr<ast::Expression> ParseBinaryOpRhs(
+std::unique_ptr<ast::BaseExpression> ParseExpression(Lexer* lexer);
+std::unique_ptr<ast::BaseExpression> ParsePrimaryExpression(Lexer* lexer);
+std::unique_ptr<ast::BaseExpression> ParseBinaryOpRhs(
     Lexer* lexer, int expression_precedence,
-    std::unique_ptr<ast::Expression> lhs_expression);
-std::unique_ptr<ast::Expression> ParseParenthesesExpression(Lexer* lexer);
-std::unique_ptr<ast::Expression> ParseIdentifierExpression(Lexer* lexer);
-std::unique_ptr<ast::Expression> ParseNumberExpression(Lexer* lexer);
+    std::unique_ptr<ast::BaseExpression> lhs_expression);
+std::unique_ptr<ast::BaseExpression> ParseParenthesesExpression(Lexer* lexer);
+std::unique_ptr<ast::BaseExpression> ParseIdentifierExpression(Lexer* lexer);
+std::unique_ptr<ast::BaseExpression> ParseNumberExpression(Lexer* lexer);
 }  // namespace
 
 namespace parser
 {
 /// top ::= definition | external | expression
-std::unique_ptr<ast::Expression> ParseNextExpression(Lexer* lexer)
+std::unique_ptr<ast::BaseExpression> ParseNextExpression(Lexer* lexer)
 {
     const tl::expected<Token, LexerError> peek_token = lexer->PeekToken();
     if (!peek_token) {
@@ -72,7 +72,7 @@ std::unique_ptr<ast::Expression> ParseNextExpression(Lexer* lexer)
 
 namespace
 {
-    std::unique_ptr<ast::Expression> LogError(const std::string& err_str)
+std::unique_ptr<ast::BaseExpression> LogError(const std::string& err_str)
 {
     std::cerr << "LogError: " << err_str << '\n';
     return nullptr;
@@ -197,7 +197,7 @@ std::unique_ptr<ast::FnPrototype> ParsePrototype(Lexer* lexer)
 /// expression
 ///   ::= primary binoprhs
 ///
-std::unique_ptr<ast::Expression> ParseExpression(Lexer* lexer)
+std::unique_ptr<ast::BaseExpression> ParseExpression(Lexer* lexer)
 {
     auto lhs_op = ParsePrimaryExpression(lexer);
     if (!lhs_op) return nullptr;
@@ -209,7 +209,7 @@ std::unique_ptr<ast::Expression> ParseExpression(Lexer* lexer)
 ///   ::= identifierexpr
 ///   ::= numberexpr
 ///   ::= parenexpr
-std::unique_ptr<ast::Expression> ParsePrimaryExpression(Lexer* lexer)
+std::unique_ptr<ast::BaseExpression> ParsePrimaryExpression(Lexer* lexer)
 {
     const tl::expected<Token, LexerError> peek_token = lexer->PeekToken();
     if (!peek_token) {
@@ -228,9 +228,9 @@ std::unique_ptr<ast::Expression> ParsePrimaryExpression(Lexer* lexer)
 
 /// binoprhs
 ///   ::= ('+' primary)*
-std::unique_ptr<ast::Expression> ParseBinaryOpRhs(
+std::unique_ptr<ast::BaseExpression> ParseBinaryOpRhs(
     Lexer* lexer, int expression_precedence,
-    std::unique_ptr<ast::Expression> lhs_expression)
+    std::unique_ptr<ast::BaseExpression> lhs_expression)
 {
     // If this is a binop, find its precedence.
     while (true) {
@@ -276,7 +276,7 @@ std::unique_ptr<ast::Expression> ParseBinaryOpRhs(
 }
 
 /// parenexpr ::= '(' expression ')'
-std::unique_ptr<ast::Expression> ParseParenthesesExpression(Lexer* lexer)
+std::unique_ptr<ast::BaseExpression> ParseParenthesesExpression(Lexer* lexer)
 {
     lexer->ConsumeToken();  // eat '('
     auto expression = ParseExpression(lexer);
@@ -296,7 +296,7 @@ std::unique_ptr<ast::Expression> ParseParenthesesExpression(Lexer* lexer)
 /// identifierexpr
 ///   ::= identifier
 ///   ::= identifier '(' expression* ')'
-std::unique_ptr<ast::Expression> ParseIdentifierExpression(Lexer* lexer)
+std::unique_ptr<ast::BaseExpression> ParseIdentifierExpression(Lexer* lexer)
 {
     const tl::expected<Token, LexerError> peek_token = lexer->PeekToken();
     if (!peek_token) {
@@ -311,7 +311,7 @@ std::unique_ptr<ast::Expression> ParseIdentifierExpression(Lexer* lexer)
 
     // Process fn call
     lexer->ConsumeToken();  // eat '('
-    std::vector<std::unique_ptr<ast::Expression>> fn_args;
+    std::vector<std::unique_ptr<ast::BaseExpression>> fn_args;
 
     tl::expected<Token, LexerError> arg_token = lexer->PeekToken();
     if (!arg_token) {
@@ -346,7 +346,7 @@ std::unique_ptr<ast::Expression> ParseIdentifierExpression(Lexer* lexer)
 }
 
 /// numberexpr ::= number
-std::unique_ptr<ast::Expression> ParseNumberExpression(Lexer* lexer)
+std::unique_ptr<ast::BaseExpression> ParseNumberExpression(Lexer* lexer)
 {
     const tl::expected<Token, LexerError> peek_token = lexer->PeekToken();
     if (!peek_token) {

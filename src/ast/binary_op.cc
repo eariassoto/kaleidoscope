@@ -4,8 +4,8 @@
 
 namespace kaleidoscope::ast
 {
-BinaryOp::BinaryOp(char op, std::unique_ptr<Expression> lhs_op,
-                   std::unique_ptr<Expression> rhs_op)
+BinaryOp::BinaryOp(char op, std::unique_ptr<BaseExpression> lhs_op,
+                   std::unique_ptr<BaseExpression> rhs_op)
     : Op(op), LhsOp(std::move(lhs_op)), RhsOp(std::move(rhs_op))
 {
 }

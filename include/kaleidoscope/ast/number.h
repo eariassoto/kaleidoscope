@@ -1,11 +1,11 @@
 #ifndef KALEIDOSCOPE_AST_NUMBER_H
 #define KALEIDOSCOPE_AST_NUMBER_H
 
-#include "kaleidoscope/ast/expression.h"
+#include "kaleidoscope/ast/base_expression.h"
 
 namespace kaleidoscope::ast
 {
-struct Number : public Expression {
+struct Number : public BaseExpression {
     Number(double value);
 
     double Value;
