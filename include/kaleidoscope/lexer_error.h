@@ -1,12 +1,11 @@
 #ifndef KALEIDOSCOPE_LEXER_ERROR_H
 #define KALEIDOSCOPE_LEXER_ERROR_H
 
-#include <exception>
 #include <string>
 
 namespace kaleidoscope
 {
-class LexerError : public std::exception
+class LexerError
 {
    public:
     LexerError() = delete;
@@ -14,7 +13,7 @@ class LexerError : public std::exception
 
     explicit LexerError(char input);
 
-    const char* what() const noexcept override;
+    const char* what() const noexcept;
 
    private:
     std::string message_;
