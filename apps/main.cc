@@ -6,9 +6,14 @@
 
 #include <iostream>
 
+using kaleidoscope::JitInterpreter;
+using kaleidoscope::Lexer;
+using kaleidoscope::LexerError;
+using kaleidoscope::ast::Expression;
+using kaleidoscope::parser::ParseNextExpression;
+
 int main()
 {
-    using namespace kaleidoscope;
     JitInterpreter interpreter;
 
     while (true) {
@@ -19,9 +24,8 @@ int main()
             if (input == "quit") break;
             if (input.empty()) continue;
 
-            Parser parser(std::make_unique<Lexer>(std::move(input)));
-            if (std::unique_ptr<ast::Expression> expr =
-                    parser.ParseNextExpression()) {
+            Lexer lex(std::move(input));
+            if (std::unique_ptr<Expression> expr = ParseNextExpression(&lex)) {
                 interpreter.EvaluateExpression(expr.get());
             }
         } catch (const LexerError& lexer_err) {
