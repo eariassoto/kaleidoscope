@@ -11,6 +11,7 @@ This project requires:
 * The LLVM libraries (I am using version 14.0.0).
 
 Dependencies fetched by CMake:
+
 * GTest
 * [fmtlib](https://github.com/fmtlib/fmt)
 * [tl::expected](https://github.com/TartanLlama/expected) (Sy Brand's `std::expected` implementation for C++11/14/17)
@@ -25,9 +26,36 @@ $> cmake -S . -B build
 
 After build, you will have the `kaleidoscope` library, and a simple executable to reads input from the standard input. In addition, there is a GTest executable for unit testing the library.
 
+**Note for building on Windows:**
+
+LLVM pre-built binaries for Windows do not include the CMake files needed to include the project via `find_package`. For this to work, you need to compile and install LLVM from sources. To generate the LLVM solution I use:
+
+```bash
+ # Shallow clone LLVM repo release 14.0.0
+ git clone git@github.com:llvm/llvm-project.git \
+     --branch llvmorg-14.0.0 \
+     --depth 1
+ cd llvm-project
+ mkdir build
+ cd build
+ cmake -S ../llvm -G "Visual Studio 17 2022" \
+     -DLLVM_ENABLE_PROJECTS=llvm \
+     -DCMAKE_BUILD_TYPE=Release \
+     -DLLVM_ENABLE_THREADS=off \
+     -DLLVM_BUILD_TESTS=off \
+     -DLLVM_INCLUDE_TESTS=off \
+     -DCMAKE_INSTALL_PREFIX=<path-to-install>
+ 
+```
+
+This will create the `build/LLVM.sln` solution file, build this in Visual Studio. Make sure to build the `INSTALL` target. Once is built, add a new enviroment variable to set `LLVM_ROOT` as `<path-to-install>\lib\cmake\llvm`.
+
+
+
 ## Getting started
 
 ## Lexer
+
 ```
 <<EOF>>              EOF
 def                  DEF
@@ -76,5 +104,4 @@ identifierexpr
   ::= IDENTIFIER LEFT_PAREN expression* RIGHT_PAREN
 
 numberexpr ::= NUMBER
-
 ```
