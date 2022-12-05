@@ -3,18 +3,43 @@
 #include "kaleidoscope/ast/base_expression.h"
 #include "kaleidoscope/ast/binary_op.h"
 #include "kaleidoscope/ast/fn_call.h"
+#include "kaleidoscope/ast/fn_prototype.h"
 #include "kaleidoscope/ast/number.h"
 
 #include <llvm/ADT/APFloat.h>
 #include <llvm/IR/Constant.h>
+#include <llvm/IR/DerivedTypes.h>>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/Value.h>
 
 #include <iostream>
+#include <vector>
 
 namespace kaleidoscope
 {
+
+namespace
+{
+llvm::Function* GeneratePrototype(const ast::FnPrototype* p,
+                                  llvm::LLVMContext& context,
+                                  llvm::Module* module)
+{
+    std::vector<llvm::Type*> prot_args(p->Args.size(),
+                                       llvm::Type::getDoubleTy(context));
+    llvm::FunctionType* fn_type = llvm::FunctionType::get(
+        llvm::Type::getDoubleTy(context), prot_args, false);
+
+    llvm::Function* fn = llvm::Function::Create(
+        fn_type, llvm::Function::ExternalLinkage, p->Name, module);
+
+    // Set names for all arguments.
+    unsigned aux = 0;
+    for (auto& Arg : fn->args()) Arg.setName(p->Args[aux++]);
+
+    return fn;
+}
+}  // namespace
 
 JitInterpreter::JitInterpreter()
     : context_(std::make_unique<llvm::LLVMContext>()),
@@ -75,14 +100,23 @@ llvm::Value* JitInterpreter::GenerateIR(const ast::BaseExpression* expression)
 
 void JitInterpreter::EvaluateExpression(const ast::BaseExpression* expression)
 {
+    if (const ast::FnPrototype* extern_call =
+            dynamic_cast<const ast::FnPrototype*>(expression)) {
+        llvm::Function* fn =
+            GeneratePrototype(extern_call, *context_, module_.get());
+        fn->print(llvm::outs());
+        return;
+    }
     if (llvm::Value* val = GenerateIR(expression)) {
         val->print(llvm::outs());
         std::cout << '\n';
-    } else {
-        std::string res;
-        expression->PrintToString(res, 0, '=');
-        std::cout << res;
+        return;
     }
+
+    // TODO: Remove this later
+    std::string res;
+    expression->PrintToString(res, 0, '=');
+    std::cout << res;
 }
 
 JitInterpreter::~JitInterpreter() = default;
