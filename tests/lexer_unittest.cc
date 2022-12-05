@@ -7,6 +7,8 @@
 
 #include <utility>
 
+#include "mock_lexer.h"
+
 using kaleidoscope::LexerImpl;
 using kaleidoscope::Token;
 using kaleidoscope::TokenType;
