@@ -45,7 +45,6 @@ LLVM pre-built binaries for Windows do not include the CMake files needed to inc
      -DLLVM_BUILD_TESTS=off \
      -DLLVM_INCLUDE_TESTS=off \
      -DCMAKE_INSTALL_PREFIX=<path-to-install>
- 
 ```
 
 This will create the `build/LLVM.sln` solution file, build this in Visual Studio. Make sure to build the `INSTALL` target. Once is built, add a new enviroment variable to set `LLVM_ROOT` as `<path-to-install>\lib\cmake\llvm`.

@@ -298,13 +298,19 @@ std::unique_ptr<ast::BaseExpression> ParseParenthesesExpression(Lexer* lexer)
 ///   ::= identifier '(' expression* ')'
 std::unique_ptr<ast::BaseExpression> ParseIdentifierExpression(Lexer* lexer)
 {
-    const tl::expected<Token, LexerError> peek_token = lexer->PeekToken();
+    tl::expected<Token, LexerError> peek_token = lexer->PeekToken();
     if (!peek_token) {
         // TODO: Handle error
         return nullptr;
     }
     const std::string_view identifier = peek_token->Value;
     lexer->ConsumeToken();  // eat identifier
+
+    peek_token = lexer->PeekToken();
+    if (!peek_token) {
+        // TODO: Handle error
+        return nullptr;
+    }
     if (peek_token->Type != TokenType::kLeftParen) {
         return std::make_unique<ast::Variable>(identifier);
     }
@@ -318,22 +324,21 @@ std::unique_ptr<ast::BaseExpression> ParseIdentifierExpression(Lexer* lexer)
         // TODO: Handle error
         return nullptr;
     }
-    if (peek_token->Type != TokenType::kRightParen) {
+    if (arg_token->Type != TokenType::kRightParen) {
         while (true) {
-            if (auto arg = ParseExpression(lexer))
+            if (auto arg = ParseExpression(lexer)) {
                 fn_args.push_back(std::move(arg));
-            else
+            } else {
                 return nullptr;
+            }
 
             arg_token = lexer->PeekToken();
             if (!arg_token) {
                 // TODO: Handle error
                 return nullptr;
             }
-
-            if (peek_token->Type == TokenType::kRightParen) break;
-
-            if (peek_token->Type != TokenType::kComma)
+            if (arg_token->Type == TokenType::kRightParen) break;
+            if (arg_token->Type != TokenType::kComma)
                 return LogError("Expected ')' or ',' in argument list");
             lexer->ConsumeToken();
         }
