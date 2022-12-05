@@ -1,12 +1,16 @@
-#include "kaleidoscope/lexer.h"
+#include "kaleidoscope/lexer_impl.h"
 
+#include "kaleidoscope/lexer_error.h"
 #include "kaleidoscope/token.h"
 
 #include <gtest/gtest.h>
 
 #include <utility>
 
-using namespace kaleidoscope;
+using kaleidoscope::LexerImpl;
+using kaleidoscope::Token;
+using kaleidoscope::TokenType;
+using kaleidoscope::LexerError;
 
 using namespace std::literals::string_view_literals;
 
@@ -16,7 +20,7 @@ void TokensInLexerMatch(const char *actual_input,
                         const std::vector<Token> &expected_tokens)
 {
     std::string input_str(actual_input);
-    Lexer lexer(std::move(input_str));
+    LexerImpl lexer(std::move(input_str));
     for (const Token &expected_token : expected_tokens) {
         const tl::expected<Token, LexerError> actual_token = lexer.PeekToken();
         ASSERT_TRUE(actual_token);

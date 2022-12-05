@@ -9,6 +9,7 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/ast/variable.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/jit_interpreter.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/lexer_error.h"
+  "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/lexer_impl.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/lexer.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/parser.h"
   "${Kaleidoscope_SOURCE_DIR}/include/kaleidoscope/token.h"
@@ -23,7 +24,7 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
   "ast/variable.cc"
   "jit_interpreter.cc"
   "lexer_error.cc"
-  "lexer.cc"
+  "lexer_impl.cc"
   "parser.cc"
   "token.cc"
 )

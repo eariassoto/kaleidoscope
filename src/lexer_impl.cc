@@ -1,4 +1,4 @@
-#include "kaleidoscope/lexer.h"
+#include "kaleidoscope/lexer_impl.h"
 
 #include "kaleidoscope/lexer_error.h"
 #include "kaleidoscope/token.h"
@@ -39,14 +39,14 @@ std::string::const_iterator AdvanceInputPos(
 }
 }  // namespace
 
-Lexer::Lexer(std::string input)
+LexerImpl::LexerImpl(std::string input)
     : input_(std::move(input)), input_to_process_(input_.data(), input_.size())
 {
 }
 
-Lexer::~Lexer() = default;
+LexerImpl::~LexerImpl() = default;
 
-tl::expected<Token, LexerError> Lexer::PeekToken()
+tl::expected<Token, LexerError> LexerImpl::PeekToken()
 {
     if (next_token_.has_value()) return next_token_.value();
 
@@ -115,7 +115,7 @@ tl::expected<Token, LexerError> Lexer::PeekToken()
     return next_token_.emplace(tl::unexpected<LexerError>(next_char));
 }
 
-void Lexer::ConsumeToken()
+void LexerImpl::ConsumeToken()
 {
     // If token has not been peeked, do it and continue
     if (!next_token_.has_value()) PeekToken();

@@ -7,30 +7,17 @@
 #include <tl/expected.hpp>
 
 #include <optional>
-#include <string_view>
-#include <string>
 
 namespace kaleidoscope
 {
-
 class Lexer
 {
    public:
-    Lexer() = delete;
-    ~Lexer();
-    explicit Lexer(std::string input);
-    Lexer(const Lexer& t) = delete;
-    Lexer& operator=(const Lexer&) = delete;
+    virtual ~Lexer() = default;
 
-    tl::expected<Token, LexerError> PeekToken();
+    virtual tl::expected<Token, LexerError> PeekToken() = 0;
 
-    void ConsumeToken();
-
-   private:
-    std::string input_;
-    std::string_view input_to_process_;
-
-    std::optional<tl::expected<Token, LexerError>> next_token_ = std::nullopt;
+    virtual void ConsumeToken() = 0;
 };
 }  // namespace kaleidoscope
 
